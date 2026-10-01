@@ -1,0 +1,567 @@
+<title>身分與存取管理動畫課</title>
+<meta name="description" content="ISO 27001:2022 身分與存取管理：ISMS 作業重點、稽核查核重點、常見缺失｜Allan Lo 講師 × 阿拉蕾助教">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<style>
+/* 版面概念：16:9 舞台 = 上方流程燈號列＋左側教學內容區＋右側 Q 版講師／助教＋下方字幕列
+   單一明亮「教室白板」風格（影片畫面不隨深淺色主題變動），外框為深色放映廳 */
+:root{
+  color-scheme: dark;
+  --ink:#1d2b3a; --paper:#fbfdfc; --board:#eef6f3; --grid:#d6e9e2;
+  --teal:#0f9f8a; --teal-d:#0f766e; --blue:#2f6fde; --violet:#7c4dcc;
+  --amber:#f2a516; --amber-d:#b45309; --red:#e5484d; --red-d:#b91c1c; --green:#16a34a;
+  --allan:#1f3a68; --arale:#7c4dcc;
+  --hall:#0d1520; --hall-2:#16212f; --hall-fg:#e6edf5; --hall-mute:#93a4b8;
+  --f-body:"Noto Sans TC","WenQuanYi Zen Hei","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-disp:"Fredoka","Noto Sans TC","WenQuanYi Zen Hei",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--hall);color:var(--hall-fg);font-family:var(--f-body);-webkit-font-smoothing:antialiased}
+.page{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding-block:12px;padding-inline:16px}
+.player{width:min(100%, calc((100vh - 120px) * 16 / 9));min-width:0}
+.stage-box{position:relative;width:100%;aspect-ratio:16/9;max-width:100%;overflow:hidden;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.45);background:var(--board)}
+#stage{position:absolute;left:0;top:0;width:1280px;height:720px;transform-origin:0 0;overflow:hidden;background:var(--board);color:var(--ink);font-family:var(--f-body)}
+body.capture{background:var(--board)}
+body.capture .page{padding:0;display:block}
+body.capture .player{width:1280px}
+body.capture .stage-box{width:1280px;height:720px;border-radius:0;box-shadow:none;aspect-ratio:auto}
+body.capture .controls, body.capture #cover{display:none!important}
+
+/* 背景格線 */
+#bg{position:absolute;inset:-40px;background-image:radial-gradient(var(--grid) 2px, transparent 2.5px);background-size:32px 32px}
+#bg2{position:absolute;right:-120px;top:120px;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle at 40% 40%, #d7f3ea, transparent 65%)}
+
+/* ===== 標頭 ===== */
+#hdr{position:absolute;left:0;top:0;width:1280px;height:62px;background:#fff;border-bottom:3px solid var(--ink);display:flex;align-items:center;gap:0;padding-left:16px;z-index:5}
+.logo{font:700 15px/1.15 var(--f-disp);color:var(--teal-d);width:150px;letter-spacing:.02em}
+.logo b{display:block;font:900 19px/1.1 var(--f-body);color:var(--ink)}
+.chevs{display:flex;margin-left:6px}
+.chevs div{height:46px;width:262px;display:flex;align-items:center;justify-content:center;font:700 17px var(--f-body);color:#7c8b98;background:#e3ece9;
+  clip-path:polygon(0 0,calc(100% - 18px) 0,100% 50%,calc(100% - 18px) 100%,0 100%,18px 50%);margin-left:-10px;transition:none}
+.chevs div:first-child{clip-path:polygon(0 0,calc(100% - 18px) 0,100% 50%,calc(100% - 18px) 100%,0 100%);margin-left:0}
+.chevs div.on{color:#fff;background:linear-gradient(90deg,#14b88f,#0f9f8a)}
+.chevs div.on.cur{background:linear-gradient(90deg,#0ea371,#057a63);box-shadow:inset 0 -4px 0 #ffd84d}
+#facet{margin-left:auto;margin-right:16px;padding:7px 16px;border-radius:999px;border:3px solid var(--ink);font:900 17px var(--f-body);background:#fff;white-space:nowrap}
+#facet.k-isms{background:#d1fae5}#facet.k-audit{background:#fde68a}#facet.k-nc{background:#fecaca}#facet.k-sum{background:#e0e7ff}#facet:empty{display:none}
+
+/* ===== 場景 ===== */
+.scene{position:absolute;left:0;top:0;width:1280px;height:720px;display:none;animation:sceneIn .6s cubic-bezier(.2,.8,.2,1) 0s both}
+.scene.on{display:block}
+.content{position:absolute;left:28px;top:80px;width:850px;height:500px}
+
+/* 動畫關鍵影格（由播放器依語音時間軸控制） */
+@keyframes sceneIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{opacity:0;transform:scale(.6)}70%{opacity:1;transform:scale(1.06)}100%{opacity:1;transform:scale(1)}}
+@keyframes up{from{opacity:0;transform:translateY(34px)}to{opacity:1;transform:none}}
+@keyframes left{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:none}}
+@keyframes right{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes zoom{0%{opacity:0;transform:scale(.2)}65%{opacity:1;transform:scale(1.08)}100%{opacity:1;transform:scale(1)}}
+@keyframes stampS{0%{opacity:0;transform:scale(2.2) rotate(2deg)}60%{opacity:1;transform:scale(.97) rotate(-2deg)}100%{opacity:1;transform:scale(1) rotate(-1deg)}}
+@keyframes stamp{0%{opacity:0;transform:scale(3) rotate(-4deg)}60%{opacity:1;transform:scale(.92) rotate(-10deg)}100%{opacity:1;transform:scale(1) rotate(-8deg)}}
+@keyframes wipe{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes out{from{opacity:1}to{opacity:0;transform:scale(.97)}}
+@keyframes hl{0%,100%{transform:scale(1)}30%{transform:scale(1.08);filter:drop-shadow(0 0 10px #ffd84d)}60%{transform:scale(1.02)}}
+
+/* ===== 共用元件 ===== */
+.ic{flex:none;vertical-align:middle}
+.tag{display:inline-flex;align-items:center;justify-content:center;min-width:52px;height:30px;padding:0 9px;margin-right:9px;border-radius:9px;background:var(--teal);color:#fff;font:700 18px var(--f-disp);letter-spacing:.02em;border:2px solid var(--ink)}
+.tag.t-red{background:var(--red)}
+.card{background:#fff;border:3px solid var(--ink);border-radius:18px;box-shadow:5px 5px 0 var(--ink);padding:14px 16px}
+.card h3{margin:0 0 10px;font:900 24px/1.2 var(--f-body);display:flex;align-items:center;gap:6px}
+ul.b{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px}
+ul.b li{position:relative;padding-left:22px;font:500 19px/1.38 var(--f-body)}
+ul.b li::before{content:"";position:absolute;left:3px;top:.55em;width:10px;height:10px;border-radius:50%;background:var(--teal);border:2px solid var(--ink)}
+ul.b.sm li{font-size:17px;line-height:1.36}
+b{font-weight:900}
+.scene-h{position:absolute;left:0;top:0;margin:0;display:flex;align-items:center;gap:10px;font:900 32px var(--f-body);color:var(--ink)}
+.scene-h.amber .ic{stroke:var(--amber-d)}
+.take{position:absolute;left:0;bottom:0;width:850px;height:50px;border-radius:14px;background:var(--ink);color:#fff;display:flex;align-items:center;padding:0 18px;font:700 21px var(--f-body);gap:6px}
+.take b{color:#ffd84d}
+.case{position:absolute;left:0;top:0;width:850px;padding-bottom:18px;background:#fff8ec;border:3px solid var(--ink);border-radius:20px;box-shadow:7px 7px 0 var(--ink);overflow:hidden}
+.case-h{display:flex;align-items:center;gap:10px;height:52px;padding:0 18px;background:var(--amber);color:#fff;font:900 23px var(--f-body);border-bottom:3px solid var(--ink);text-shadow:0 1px 0 rgba(0,0,0,.25)}
+.fixbox{margin:0 18px;background:#ecfdf3;border:3px solid var(--green);border-radius:16px;padding:12px 16px}
+.fix-h{display:flex;align-items:center;gap:8px;font:900 21px var(--f-body);color:#15803d;margin-bottom:10px}
+.stampx,.seal,.rank,.bye,.quiz-a,.hero,.sticker{display:inline-block;border:4px solid var(--red);color:var(--red);font:900 24px var(--f-body);padding:2px 12px;border-radius:10px;background:rgba(255,255,255,.85);transform:rotate(-8deg)}
+
+/* ===== S0 開場 ===== */
+.title-wrap{position:absolute;inset:0;padding:22px 10px 0}
+.eyebrow{font:700 18px var(--f-body);color:var(--teal-d);letter-spacing:.04em}
+.big-title{margin:8px 0 0;font:900 84px/1.08 var(--f-body);letter-spacing:.02em;color:var(--ink);text-shadow:4px 4px 0 #bfeee0}
+.hl-y{background:linear-gradient(transparent 58%, #ffe066 58%)}
+.sub-title{font:600 32px var(--f-disp);color:var(--blue);margin-top:6px}
+.facets{display:flex;gap:16px;margin-top:24px}
+.facet{display:flex;align-items:center;gap:10px;height:66px;padding:0 20px;border-radius:16px;border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);color:#fff;font-size:24px}
+.facet.f1{background:var(--teal)}.facet.f2{background:var(--amber)}.facet.f3{background:var(--red)}
+.intro-row{display:flex;gap:16px;margin-top:26px}
+.badge-name{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;white-space:nowrap;padding:10px 16px;border-radius:14px;background:#fff;border:3px solid var(--ink);font:900 26px var(--f-body)}
+.badge-name small{font:700 15px var(--f-body);color:#fff;padding:2px 8px;border-radius:6px;background:var(--allan)}
+.badge-name.pp small{background:var(--arale)}
+.badge-name em{flex-basis:100%;font:500 15px var(--f-body);font-style:normal;color:#526170}
+.sticker{position:absolute;right:6px;top:118px;font-size:22px;line-height:1.25;text-align:center;padding:10px 16px;border-color:var(--blue);color:var(--blue)}
+
+/* ===== S1 全景 ===== */
+.map{position:absolute;left:0;top:62px;width:850px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.map-col{background:#fff;border:3px solid var(--ink);border-radius:16px;box-shadow:4px 4px 0 var(--ink);padding:0 0 10px;display:flex;flex-direction:column;gap:9px;overflow:hidden}
+.chev{background:linear-gradient(90deg,#14b88f,#0f9f8a);color:#fff;font:900 18px var(--f-body);padding:11px 12px;border-bottom:3px solid var(--ink);text-align:center}
+.c2 .chev{background:linear-gradient(90deg,#3b82f6,#2f6fde)}.c3 .chev{background:linear-gradient(90deg,#8b5cf6,#7c4dcc)}
+.c2 .tag{background:var(--blue)}.c3 .tag{background:var(--violet)}
+.chip{display:flex;align-items:center;margin:0 10px;padding:6px 8px;border-radius:12px;background:#f2f7f5;font:700 19px var(--f-body)}
+.chip .tag{min-width:48px;height:28px;font-size:16px}
+.c2 .chip .tag.t-red{background:var(--red)}
+.fixchip{background:#fff1f1;outline:2px dashed var(--red)}
+.col-note{margin:2px 12px 0;font:900 17px var(--f-body);color:#64748b;text-align:right}
+.correction{position:absolute;left:0;top:388px;width:476px;padding:10px 14px;border:3px solid var(--red);border-radius:14px;background:#fff;font:500 18px/1.45 var(--f-body);transform:rotate(-1deg)}
+.correction b{color:#fff;background:var(--red);padding:1px 8px;border-radius:6px;margin-right:6px}
+.correction u{text-decoration:none;color:var(--red);font:700 22px var(--f-disp)}
+.correction small{color:#526170;font-size:15px}
+.slogan{position:absolute;left:490px;top:388px;width:330px;height:96px;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 14px;border-radius:14px;background:var(--ink);color:#ffd84d;font:900 22px/1.4 var(--f-body)}
+
+/* ===== S2 第一段 ===== */
+.principle{position:absolute;left:0;top:0;width:850px;height:64px;border-radius:16px;background:var(--teal-d);border:3px solid var(--ink);display:flex;align-items:center;justify-content:center;gap:18px;color:#fff;font:900 25px var(--f-body)}
+.principle span{display:flex;align-items:center;gap:8px}
+.principle i{font:600 17px var(--f-disp);font-style:normal;opacity:.85}
+.principle .plus{color:#ffd84d;font-size:30px}
+.cards3{position:absolute;left:0;top:84px;width:850px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cards3 .card{min-height:262px}
+.k2 h3 .tag{background:var(--amber)}.k3 h3 .tag{background:var(--blue)}
+.note-bubble{position:absolute;left:250px;top:372px;padding:12px 18px;border-radius:18px;background:#fff7d6;border:3px solid var(--ink);font:500 20px var(--f-body);box-shadow:4px 4px 0 var(--ink)}
+.case-body{display:grid;grid-template-columns:330px 1fr;grid-template-rows:auto 1fr;gap:12px 18px;padding:16px 18px}
+.who{display:flex;flex-direction:column;gap:10px}
+.avatar{display:flex;align-items:center;gap:10px;font:900 22px var(--f-body)}
+.avatar .ic{background:#e2e8f0;border-radius:50%;padding:6px;border:3px solid var(--ink)}
+.perm{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:12px;background:#fff;border:3px solid #b45309;font:700 20px var(--f-body)}
+.risk{grid-column:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;background:#fee2e2;border:3px solid var(--red);color:var(--red-d);font:900 19px var(--f-body)}
+.sod{grid-column:2;grid-row:1 / span 2;background:#fff;border:3px solid var(--ink);border-radius:16px;padding:12px 14px}
+.sod-h{font:900 20px var(--f-body);margin-bottom:8px;color:#15803d}
+.sod table{border-collapse:collapse;width:100%;font:700 17px var(--f-body);text-align:center}
+.sod th,.sod td{border:2px solid #cbd5e1;padding:8px 4px}
+.sod th{background:#f1f5f9}
+.sod td.ng{background:#fee2e2;color:var(--red);font-size:24px}
+.sod td.ok{color:var(--green);font-size:22px}
+.sod-f{margin-top:10px;font:500 18px var(--f-body)}
+.sod-f b{color:#15803d}
+
+/* ===== S3 第二段 ===== */
+.jml{position:absolute;left:0;top:0;width:300px;height:300px}
+.jml-ring{position:absolute;inset:0;width:300px;height:300px;transform:rotate(-90deg)}
+.ring-draw{stroke-dasharray:1}
+.jml-c{position:absolute;left:100px;top:118px;width:100px;text-align:center;font:900 22px/1.25 var(--f-body);color:var(--blue)}
+.jml-n{position:absolute;width:104px;height:104px;border-radius:50%;background:var(--blue);border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}
+.jml-n b{font-size:21px}.jml-n i{font:600 14px var(--f-disp);font-style:normal;opacity:.9}
+.jml-n.n1{left:98px;top:-6px}.jml-n.n2{left:194px;top:150px;background:var(--teal)}.jml-n.n3{left:2px;top:150px;background:var(--red)}
+.grid4{position:absolute;left:322px;top:0;width:528px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card.mini{padding:11px 13px;min-height:200px}
+.card.mini h3{font-size:21px;margin-bottom:8px}
+.card.mini .tag{background:var(--blue)}
+.card.mini .tag.t-red{background:var(--red)}
+.grid4 ul.b.sm li{font-size:16px}
+.postit{position:absolute;left:40px;top:318px;width:210px;padding:16px;background:#fff59d;border:2px solid #d4b106;box-shadow:4px 6px 0 rgba(0,0,0,.18);font:500 20px/1.4 var(--f-body);transform:rotate(-4deg)}
+.postit b{font:700 28px var(--f-disp)}
+.postit .stampx{position:absolute;right:-26px;bottom:-14px}
+.creep{position:absolute;left:12px;top:310px;width:290px;padding:10px 14px;background:#fff;border:3px solid var(--ink);border-radius:16px;box-shadow:4px 4px 0 var(--ink)}
+.creep-h{font:900 18px var(--f-body);color:var(--red-d)}
+.bars{display:flex;align-items:flex-end;gap:16px;height:100px;margin:8px 0 4px;padding:0 6px}
+.bar{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;font:700 14px var(--f-body)}
+.bar i{display:block;width:100%;border-radius:6px 6px 0 0;background:#93c5fd;border:2px solid var(--ink)}
+.bar i.hot{background:var(--red)}
+.creep-f{font:900 17px var(--f-body);text-align:right}
+.tl{display:flex;align-items:center;gap:8px;padding:22px 18px 18px}
+.tl-i{flex:1;padding:12px;border-radius:14px;background:#fff;border:3px solid var(--ink);font:500 18px/1.35 var(--f-body);text-align:center}
+.tl-i b{display:block;font:700 22px var(--f-disp);color:var(--blue)}
+.tl-i.warn b{color:var(--amber-d)}.tl-i.bad{background:#fee2e2;border-color:var(--red)}.tl-i.bad b{color:var(--red)}
+.tl-a{font:900 26px var(--f-body);color:#64748b}
+.fix-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fix-i{display:flex;align-items:flex-start;gap:8px;background:#fff;border:2px solid #86efac;border-radius:12px;padding:10px 12px;font:700 18px/1.4 var(--f-body)}
+.fix-i small{font-weight:500;color:#475569;font-size:15px}
+
+/* ===== S4 第三段 ===== */
+.hubmap{position:absolute;left:0;top:0;width:850px;height:438px}
+.spokes{position:absolute;inset:0;width:850px;height:438px}
+.spokes path{fill:none;stroke:#f2a516;stroke-width:6;stroke-dasharray:1;stroke-linecap:round}
+.hub{position:absolute;left:363px;top:155px;width:124px;height:124px;border-radius:50%;background:var(--ink);border:4px solid #f2a516;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font:900 22px var(--f-body)}
+.hero{position:absolute;top:-30px;right:-58px;font-size:20px;border-color:var(--violet);color:var(--violet)}
+.spot{position:absolute;width:340px;background:#fff;border:3px solid var(--ink);border-radius:16px;box-shadow:4px 4px 0 var(--ink);padding:11px 13px}
+.spot h3{margin:0 0 7px;font:900 20px var(--f-body);display:flex;align-items:center}
+.spot .tag{background:var(--violet);min-width:46px;height:28px;font-size:16px}
+.spot ul.b.sm li{font-size:16px}
+.spot code{font:600 16px var(--f-disp);background:#f1f5f9;padding:1px 6px;border-radius:6px}
+.s-tl{left:0;top:0}.s-tr{right:0;top:0}.s-bl{left:0;bottom:0}.s-br{right:0;bottom:0}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:20px 18px 16px}
+.fact{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;background:#fff;border:3px solid var(--red);border-radius:14px;font:500 19px var(--f-body);text-align:center}
+.flow{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
+.flow span{display:flex;align-items:center;gap:5px;padding:9px 10px;border-radius:12px;background:#fff;border:2px solid #86efac;font:700 17px var(--f-body);white-space:nowrap}
+.flow em{font-style:normal;color:#15803d;font-weight:900}
+
+/* ===== S5 稽核 ===== */
+.scene-h.amber{color:#7c3e06}
+.audit3{position:absolute;left:0;top:60px;width:850px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card.au{position:relative;min-height:268px;padding-top:16px}
+.card.au h3{color:#7c3e06}
+.au-no{position:absolute;right:12px;top:-16px;width:40px;height:40px;border-radius:50%;background:var(--amber);border:3px solid var(--ink);color:#fff;font:700 22px var(--f-disp);display:flex;align-items:center;justify-content:center}
+.card.au ul.b li::before{background:var(--amber)}
+.cmp{display:flex;align-items:center;gap:6px}
+.cmp-l{flex:1;display:flex;flex-direction:column;gap:4px;font:500 15px var(--f-body)}
+.cmp-l b{font-size:14px;color:#475569}
+.cmp-l span{background:#f1f5f9;border-radius:6px;padding:2px 6px;font-family:var(--f-disp)}
+.cmp-l span.del{text-decoration:line-through;color:#94a3b8}
+.cmp-l span.g{background:#ede9fe;color:var(--violet);font-weight:700}
+.cmp-x{font:900 22px var(--f-body);color:#64748b}
+.ghost{position:absolute;right:-14px;bottom:-20px;display:flex;align-items:center;gap:4px;padding:6px 10px;border-radius:12px;background:#f5f3ff;border:3px solid var(--violet);color:var(--violet);font:900 19px var(--f-body);transform:rotate(6deg)}
+.ask{margin-top:12px;padding:8px 10px;border-radius:10px;background:#fff7d6;border:2px solid var(--amber);font:500 15px/1.4 var(--f-body)}
+.seal{position:absolute;right:18px;bottom:22px;font-size:26px}
+.onsite{position:absolute;left:0;top:350px;width:850px;display:flex;align-items:center;gap:10px;flex-wrap:nowrap}
+.onsite>b{font:900 19px var(--f-body);padding:8px 12px;border-radius:10px;background:var(--ink);color:#fff;white-space:nowrap}
+.onsite span{display:flex;align-items:center;gap:5px;padding:7px 10px;border-radius:10px;background:#fff;border:2px solid var(--ink);font:700 15px var(--f-body);white-space:nowrap}
+.four{position:absolute;left:0;top:420px;width:850px;height:62px;border-radius:16px;background:var(--amber);border:3px solid var(--ink);display:flex;align-items:center;justify-content:center;gap:10px;font:900 24px var(--f-body);color:var(--ink)}
+.four b{background:#fff;border:2px solid var(--ink);border-radius:10px;padding:2px 12px}
+.four em{font-style:normal}
+
+/* ===== S6 缺失 ===== */
+.scene-h.red{color:var(--red-d)}
+.nc-grid{position:absolute;left:0;top:62px;width:850px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.nc{position:relative;height:196px;background:#fff;border:3px solid var(--ink);border-radius:16px;box-shadow:4px 4px 0 var(--ink);padding:12px 12px 10px;display:flex;flex-direction:column;gap:8px}
+.nc-no{position:absolute;left:-10px;top:-12px;width:36px;height:36px;border-radius:50%;background:var(--red);border:3px solid var(--ink);color:#fff;font:700 20px var(--f-disp);display:flex;align-items:center;justify-content:center}
+.nc-t{font:900 20px/1.3 var(--f-body);padding-left:16px;min-height:52px}
+.nc-c .tag{font-size:15px;height:26px;min-width:44px}
+.nc-d{font:500 15.5px/1.42 var(--f-body);color:#3b4757}
+.rank{position:absolute;right:-8px;top:-18px;font:700 22px var(--f-disp);background:#ffd84d;border-color:var(--red-d);color:var(--red-d)}
+.homework{position:absolute;left:640px;top:276px;width:200px;padding:14px;background:#fff59d;border:2px solid #d4b106;box-shadow:4px 6px 0 rgba(0,0,0,.18);font:700 20px/1.4 var(--f-body);transform:rotate(4deg);z-index:2}
+.homework small{font-weight:500;color:#64748b}
+.quiz{position:absolute;left:30px;top:40px;width:790px;height:400px;background:#fff;border:4px solid var(--ink);border-radius:22px;box-shadow:8px 8px 0 var(--ink);padding:0 26px}
+.quiz-h{margin:0 -26px;height:58px;display:flex;align-items:center;justify-content:center;background:var(--violet);color:#fff;font:900 28px var(--f-body);border-radius:18px 18px 0 0;border-bottom:4px solid var(--ink);letter-spacing:.1em}
+.quiz-q{margin-top:22px;padding-right:200px;font:500 25px/1.55 var(--f-body)}
+.quiz-a{position:absolute;right:34px;top:96px;font-size:54px;padding:4px 22px;border-width:6px}
+.quiz-why{position:absolute;left:26px;right:26px;bottom:24px;display:flex;gap:10px;align-items:flex-start;padding:14px 16px;border-radius:14px;background:#ecfdf3;border:3px solid var(--green);font:500 20px/1.5 var(--f-body)}
+
+/* ===== S7 總結 ===== */
+.sum3{position:absolute;left:0;top:62px;width:850px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.sum3 .card{min-height:230px}
+.sm2 ul.b li::before{background:var(--amber)}.sm3 ul.b li::before{background:var(--red)}
+.motto{position:absolute;left:0;top:322px;width:850px;padding:18px;text-align:center;border-radius:18px;background:var(--ink);color:#fff;font:700 27px/1.5 var(--f-body)}
+.motto b{color:#ffd84d}
+.bye{position:absolute;left:300px;top:418px;font-size:34px;border-color:var(--teal);color:var(--teal-d)}
+
+/* ===== 角色 ===== */
+.char{position:absolute;will-change:transform}
+#allanWrap{left:1000px;top:286px;width:270px;height:300px;z-index:3}
+#araleWrap{left:858px;top:372px;width:168px;height:232px;z-index:4}
+.char svg{width:100%;height:100%;overflow:visible}
+.mouthO{transform-box:fill-box;transform-origin:center}
+.char .nametag{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);font:900 14px var(--f-body);color:#fff;padding:1px 10px;border-radius:999px;border:2px solid var(--ink);white-space:nowrap}
+
+/* ===== 字幕 ===== */
+#sub{position:absolute;left:28px;top:604px;width:1224px;height:94px;background:#fff;border:3px solid var(--ink);border-radius:18px;box-shadow:0 5px 0 var(--ink);display:flex;align-items:center;gap:16px;padding:0 22px;z-index:6}
+#subWho{flex:none;min-width:104px;text-align:center;padding:6px 12px;border-radius:12px;color:#fff;font:900 20px var(--f-body);background:var(--allan)}
+#subWho.r{background:var(--arale)}
+#subWho:empty{visibility:hidden}
+#subTxt{font:700 28px/1.38 var(--f-body);color:var(--ink);min-width:0}
+#chap{position:absolute;left:0;top:713px;width:1280px;height:7px;display:flex;gap:3px;z-index:7}
+#chap div{position:relative;height:100%;background:#c9dad4;overflow:hidden}
+#chap div i{position:absolute;left:0;top:0;bottom:0;background:var(--teal)}
+
+/* ===== 封面（互動播放前） ===== */
+#cover{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(13,21,32,.55);backdrop-filter:blur(2px)}
+#cover button{font:900 30px var(--f-body);padding:16px 38px;border-radius:999px;border:4px solid var(--ink);background:#ffd84d;color:var(--ink);box-shadow:0 6px 0 var(--ink);cursor:pointer}
+#cover button:focus-visible{outline:4px solid #fff;outline-offset:4px}
+#cover p{margin:0;color:#fff;font:500 18px var(--f-body)}
+
+/* ===== 控制列 ===== */
+.controls{width:100%;display:flex;flex-direction:column;gap:8px;color:var(--hall-fg)}
+.bar-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.controls button,.controls select{font:700 14px var(--f-body);color:var(--hall-fg);background:var(--hall-2);border:1px solid #2b3a4d;border-radius:10px;padding:8px 12px;cursor:pointer;min-height:38px}
+.controls button:hover,.controls select:hover{border-color:var(--teal)}
+.controls button:focus-visible,.controls select:focus-visible,#seek:focus-visible{outline:2px solid #ffd84d;outline-offset:2px}
+#play{min-width:84px;background:var(--teal);border-color:var(--teal);color:#fff}
+#seek{position:relative;flex:1 1 240px;min-width:0;height:12px;border-radius:6px;background:#26354a;cursor:pointer}
+#seekFill{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:var(--teal)}
+.tick{position:absolute;top:-3px;width:3px;height:18px;background:#ffd84d;border-radius:2px;pointer-events:none}
+#time{font:600 14px var(--f-disp);color:var(--hall-mute);font-variant-numeric:tabular-nums;white-space:nowrap}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips button{font-size:13px;padding:6px 10px;min-height:32px}
+.chips button.cur{background:#ffd84d;color:var(--ink);border-color:#ffd84d}
+@media (prefers-reduced-motion: reduce){ #cover{backdrop-filter:none} }
+</style>
+
+<div class="page">
+  <div class="player">
+    <div class="stage-box" id="box">
+      <div id="stage">
+        <div id="bg"></div><div id="bg2"></div>
+        <header id="hdr">
+          <div class="logo">ISO 27001:2022<b>身分與存取管理</b></div>
+          <div class="chevs"><div data-s="1">基於業務營運之存取要求</div><div data-s="2">使用者存取管理</div><div data-s="3">系統、應用、實體存取管理</div></div>
+          <div id="facet"></div>
+        </header>
+        <!--SCENES-->
+        <!-- Q版講師 Allan Lo -->
+        <div class="char" id="allanWrap">
+          <svg viewBox="-50 0 280 300" aria-label="Q版 Allan Lo 講師">
+            <ellipse cx="110" cy="293" rx="70" ry="8" fill="rgba(0,0,0,.14)"/>
+            <rect x="84" y="236" width="19" height="48" rx="8" fill="#2b3245"/>
+            <rect x="117" y="236" width="19" height="48" rx="8" fill="#2b3245"/>
+            <ellipse cx="90" cy="286" rx="17" ry="7" fill="#111"/><ellipse cx="131" cy="286" rx="17" ry="7" fill="#111"/>
+            <g id="alArm2">
+              <path d="M154 190 Q176 214 166 246" stroke="#1f3a68" stroke-width="21" stroke-linecap="round" fill="none"/>
+              <circle cx="166" cy="250" r="10.5" fill="#ffd6b0" stroke="#1d2b3a" stroke-width="2"/>
+            </g>
+            <path d="M56 254 Q54 176 110 170 Q166 176 164 254 Z" fill="#1f3a68" stroke="#1d2b3a" stroke-width="3"/>
+            <path d="M93 174 L127 174 L110 214 Z" fill="#fff"/>
+            <path d="M93 174 L104 216 L84 196 Z" fill="#17305a"/><path d="M127 174 L116 216 L136 196 Z" fill="#17305a"/>
+            <path d="M106 180 L114 180 L118 213 L110 226 L102 213 Z" fill="#e63946" stroke="#1d2b3a" stroke-width="1.5"/>
+            <rect x="128" y="204" width="28" height="15" rx="3" fill="#fff"/><text x="142" y="215.5" font-size="9" font-weight="700" text-anchor="middle" fill="#1f3a68" font-family="Fredoka,sans-serif">ALLAN</text>
+            <g id="alArm">
+              <path d="M66 190 Q40 194 26 174" stroke="#1f3a68" stroke-width="21" stroke-linecap="round" fill="none"/>
+              <line x1="22" y1="170" x2="-38" y2="108" stroke="#8b5a2b" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="-38" cy="108" r="6" fill="#e63946"/>
+              <circle cx="23" cy="171" r="10.5" fill="#ffd6b0" stroke="#1d2b3a" stroke-width="2"/>
+            </g>
+            <g id="alHead">
+              <circle cx="38" cy="108" r="13" fill="#ffd0a6" stroke="#1d2b3a" stroke-width="2.5"/>
+              <circle cx="182" cy="108" r="13" fill="#ffd0a6" stroke="#1d2b3a" stroke-width="2.5"/>
+              <circle cx="110" cy="102" r="72" fill="#ffd9b8" stroke="#1d2b3a" stroke-width="3"/>
+              <path d="M38 106 C28 40 70 20 112 22 C160 22 194 50 182 106 C178 82 166 68 148 62 C128 76 96 74 74 60 C58 70 46 84 38 106 Z" fill="#26262e"/>
+              <path d="M74 60 C98 48 128 46 148 62" stroke="#4a4a56" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <path d="M66 84 Q83 75 100 83" stroke="#26262e" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+              <path d="M120 83 Q137 75 154 84" stroke="#26262e" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+              <g id="alEyes">
+                <ellipse cx="84" cy="108" rx="6.5" ry="8.5" fill="#1d1d24"/><circle cx="86" cy="105" r="2.2" fill="#fff"/>
+                <ellipse cx="136" cy="108" rx="6.5" ry="8.5" fill="#1d1d24"/><circle cx="138" cy="105" r="2.2" fill="#fff"/>
+              </g>
+              <rect x="61" y="91" width="46" height="33" rx="11" fill="rgba(255,255,255,.18)" stroke="#2b2b2b" stroke-width="4.5"/>
+              <rect x="113" y="91" width="46" height="33" rx="11" fill="rgba(255,255,255,.18)" stroke="#2b2b2b" stroke-width="4.5"/>
+              <path d="M107 104 Q110 99 113 104" stroke="#2b2b2b" stroke-width="4" fill="none"/>
+              <path d="M61 102 L40 98 M159 102 L180 98" stroke="#2b2b2b" stroke-width="4"/>
+              <path d="M108 120 Q113 127 108 130" stroke="#d9a07c" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <ellipse cx="68" cy="136" rx="10" ry="6" fill="#ff9aa2" opacity=".55"/><ellipse cx="152" cy="136" rx="10" ry="6" fill="#ff9aa2" opacity=".55"/>
+              <path id="alSmile" d="M95 143 Q110 156 125 143" stroke="#7a1f2b" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+              <g id="alMouth" class="mouthO">
+                <path d="M96 141 Q110 139 124 141 Q124 160 110 160 Q96 160 96 141 Z" fill="#6b1424"/>
+                <ellipse cx="110" cy="154" rx="8" ry="4" fill="#ff7b8a"/>
+              </g>
+              <g id="alHat" style="display:none">
+                <path d="M40 74 Q46 16 110 14 Q174 16 180 74 Z" fill="#8b5e3c" stroke="#1d2b3a" stroke-width="3"/>
+                <path d="M42 66 Q110 52 178 66 L178 76 Q110 62 42 76 Z" fill="#5c3b22"/>
+                <path d="M26 78 Q110 54 194 78 Q110 90 26 78 Z" fill="#6f4a2f" stroke="#1d2b3a" stroke-width="3"/>
+                <text x="110" y="50" font-size="17" font-weight="900" text-anchor="middle" fill="#ffd84d" font-family="Noto Sans TC,sans-serif">稽核員</text>
+              </g>
+            </g>
+          </svg>
+          <span class="nametag" style="background:#1f3a68">Allan 老師</span>
+        </div>
+        <!-- 助教 阿拉蕾（原創 Q 版造型） -->
+        <div class="char" id="araleWrap">
+          <svg viewBox="0 0 200 280" aria-label="助教阿拉蕾">
+            <ellipse cx="100" cy="272" rx="52" ry="7" fill="rgba(0,0,0,.14)"/>
+            <path d="M28 112 C18 40 62 18 100 18 C138 18 182 40 172 112 L174 156 Q152 166 140 146 L60 146 Q48 166 26 156 Z" fill="#5b3a99" stroke="#1d2b3a" stroke-width="3"/>
+            <rect x="80" y="226" width="15" height="36" rx="6" fill="#ffe0c4"/><rect x="105" y="226" width="15" height="36" rx="6" fill="#ffe0c4"/>
+            <ellipse cx="86" cy="264" rx="14" ry="7" fill="#e5484d" stroke="#1d2b3a" stroke-width="2"/><ellipse cx="114" cy="264" rx="14" ry="7" fill="#e5484d" stroke="#1d2b3a" stroke-width="2"/>
+            <path d="M54 234 Q58 170 100 166 Q142 170 146 234 Z" fill="#4cc3e8" stroke="#1d2b3a" stroke-width="3"/>
+            <path d="M82 168 L100 186 L118 168 Z" fill="#fff" stroke="#1d2b3a" stroke-width="2"/>
+            <circle cx="100" cy="206" r="9" fill="#ffd84d" stroke="#1d2b3a" stroke-width="2"/>
+            <g>
+              <path d="M60 184 Q42 200 50 214" stroke="#4cc3e8" stroke-width="16" stroke-linecap="round" fill="none"/>
+              <rect x="22" y="196" width="40" height="50" rx="5" fill="#b07a45" stroke="#1d2b3a" stroke-width="2.5"/>
+              <rect x="27" y="204" width="30" height="36" rx="2" fill="#fff"/>
+              <path d="M31 212h20M31 219h20M31 226h14" stroke="#94a3b8" stroke-width="2"/>
+              <circle cx="52" cy="214" r="8" fill="#ffe0c4" stroke="#1d2b3a" stroke-width="2"/>
+            </g>
+            <g id="arArm">
+              <path d="M140 184 Q160 170 168 148" stroke="#4cc3e8" stroke-width="16" stroke-linecap="round" fill="none"/>
+              <circle cx="169" cy="144" r="9" fill="#ffe0c4" stroke="#1d2b3a" stroke-width="2"/>
+            </g>
+            <g id="arHead">
+              <circle cx="100" cy="104" r="62" fill="#ffe2c8" stroke="#1d2b3a" stroke-width="3"/>
+              <path d="M40 98 C44 50 78 40 100 42 C124 40 158 50 160 98 C152 82 140 72 128 74 C120 88 80 88 72 74 C60 72 48 82 40 98 Z" fill="#5b3a99"/>
+              <path d="M42 66 C46 18 154 18 158 66 Q100 50 42 66 Z" fill="#ff4d6d" stroke="#1d2b3a" stroke-width="3"/>
+              <circle cx="100" cy="38" r="12" fill="#fff" stroke="#1d2b3a" stroke-width="2"/>
+              <text x="100" y="43.5" font-size="14" font-weight="900" text-anchor="middle" fill="#ff4d6d" font-family="Noto Sans TC,sans-serif">助</text>
+              <g id="arEyes">
+                <ellipse cx="77" cy="110" rx="8" ry="10.5" fill="#1d1d24"/><circle cx="80" cy="106" r="3" fill="#fff"/>
+                <ellipse cx="123" cy="110" rx="8" ry="10.5" fill="#1d1d24"/><circle cx="126" cy="106" r="3" fill="#fff"/>
+              </g>
+              <circle cx="77" cy="109" r="24" fill="rgba(255,255,255,.28)" stroke="#1b1b1b" stroke-width="5"/>
+              <circle cx="123" cy="109" r="24" fill="rgba(255,255,255,.28)" stroke="#1b1b1b" stroke-width="5"/>
+              <path d="M101 107 h-2" stroke="#1b1b1b" stroke-width="5"/>
+              <ellipse cx="60" cy="140" rx="10" ry="6" fill="#ff8fa3" opacity=".6"/><ellipse cx="140" cy="140" rx="10" ry="6" fill="#ff8fa3" opacity=".6"/>
+              <path id="arSmile" d="M89 142 Q100 153 111 142" stroke="#7a1f2b" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <g id="arMouth" class="mouthO">
+                <path d="M89 140 Q100 138 111 140 Q111 157 100 157 Q89 157 89 140 Z" fill="#6b1424"/>
+                <ellipse cx="100" cy="152" rx="6" ry="3" fill="#ff7b8a"/>
+              </g>
+            </g>
+          </svg>
+          <span class="nametag" style="background:#7c4dcc">阿拉蕾助教</span>
+        </div>
+        <div id="sub"><div id="subWho"></div><div id="subTxt"></div></div>
+        <div id="chap"></div>
+        <div id="cover"><button id="start" type="button">▶ 開始上課</button><p>約 <span id="dur"></span> 分鐘｜請開啟聲音</p></div>
+      </div>
+    </div>
+    <div class="controls">
+      <div class="bar-row">
+        <button id="play" type="button">▶ 播放</button>
+        <button id="prev" type="button" aria-label="上一章">⏮</button>
+        <button id="next" type="button" aria-label="下一章">⏭</button>
+        <div id="seek" role="slider" tabindex="0" aria-label="播放進度" aria-valuemin="0"><div id="seekFill"></div></div>
+        <span id="time">0:00 / 0:00</span>
+        <select id="rate" aria-label="播放速度"><option value="0.8">0.8×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option></select>
+        <button id="fs" type="button">全螢幕</button>
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
+  </div>
+</div>
+<audio id="aud" preload="auto" src="narration.mp3"></audio>
+<script>
+const TL = /*TIMELINE*/null;
+const META = /*META*/null;
+(function(){
+  const $ = s => document.querySelector(s);
+  const capture = /[?&]capture/.test(location.search);
+  if (capture) document.body.classList.add('capture');
+  const stage = $('#stage'), box = $('#box'), aud = $('#aud');
+  const sceneEls = [...document.querySelectorAll('.scene')];
+  const DUR = {stampS:.5,pop:.55,up:.6,left:.55,right:.55,fade:.5,zoom:.7,stamp:.45,wipe:.9,draw:1.3};
+  const EASE = {pop:'cubic-bezier(.34,1.56,.64,1)',zoom:'cubic-bezier(.34,1.4,.64,1)',stamp:'cubic-bezier(.2,.9,.3,1.2)',draw:'ease-in-out'};
+
+  // 依時間軸把 data-in / data-out / data-hl 轉成 CSS 動畫延遲
+  sceneEls.forEach((el, si) => {
+    const sc = TL.scenes[si];
+    const at = k => { const L = sc.lines[Math.min(k, sc.lines.length-1)]; return L.start - sc.start; };
+    el.querySelectorAll('[data-in]').forEach(n => {
+      const [type, k, d] = n.dataset.in.split(' ');
+      const list = [`${type} ${DUR[type]}s ${EASE[type]||'ease-out'} ${(at(+k)+(+d)).toFixed(3)}s both`];
+      if (n.dataset.out) list.push(`out .45s ease-in ${at(+n.dataset.out).toFixed(3)}s forwards`);
+      if (n.dataset.hl) n.dataset.hl.split(' ').forEach(h => list.push(`hl 1.1s ease ${(at(+h)+0.3).toFixed(3)}s 1 none`));
+      n.style.animation = list.join(', ');
+    });
+  });
+
+  // 章節進度
+  const chap = $('#chap');
+  TL.scenes.forEach(s => { const d = document.createElement('div'); d.style.flex = (s.end - s.start).toFixed(2); d.innerHTML = '<i></i>'; chap.appendChild(d); });
+  const chapFills = [...chap.querySelectorAll('i')];
+
+  const hdrChevs = [...document.querySelectorAll('.chevs div')];
+  const facet = $('#facet');
+  const al = { wrap: $('#allanWrap'), arm: $('#alArm'), head: $('#alHead'), eyes: $('#alEyes'), smile: $('#alSmile'), mouth: $('#alMouth'), hat: $('#alHat') };
+  const ar = { wrap: $('#araleWrap'), arm: $('#arArm'), head: $('#arHead'), eyes: $('#arEyes'), smile: $('#arSmile'), mouth: $('#arMouth') };
+  const subWho = $('#subWho'), subTxt = $('#subTxt');
+  let cur = -1, anims = [], lastSub = '';
+
+  function sceneAt(t){ let i = 0; while (i < TL.scenes.length - 1 && t >= TL.scenes[i+1].start) i++; return i; }
+  function setScene(i){
+    cur = i;
+    sceneEls.forEach((el, k) => el.classList.toggle('on', k === i));
+    anims = sceneEls[i].getAnimations({subtree:true});
+    anims.forEach(a => a.pause());
+    const m = META[i];
+    hdrChevs.forEach(c => { const s = +c.dataset.s; c.classList.toggle('on', m.stage === 6 || m.stage === 4 || m.stage === 5 || s === m.stage); c.classList.toggle('cur', s === m.stage); });
+    facet.textContent = m.facet || '';
+    facet.className = {'ISMS 作業重點':'k-isms','稽核查核重點':'k-audit','常見的缺失':'k-nc','總結':'k-sum'}[m.facet] || '';
+    al.hat.style.display = m.hat ? '' : 'none';
+    document.querySelectorAll('#chips button').forEach((b,k)=>b.classList.toggle('cur', k===i));
+  }
+  function mouth(c, k){
+    c.smile.style.display = k < 0.08 ? '' : 'none';
+    c.mouth.style.display = k < 0.08 ? 'none' : '';
+    c.mouth.style.transform = `scale(${0.85 + k*0.25}, ${Math.max(.08, k)})`;
+  }
+  function renderAt(t){
+    t = Math.max(0, Math.min(TL.duration - 0.001, t));
+    const i = sceneAt(t);
+    if (i !== cur) setScene(i);
+    const sc = TL.scenes[i], lt = (t - sc.start) * 1000;
+    for (const a of anims) a.currentTime = lt;
+    // 目前句子
+    let li = -1;
+    for (let k = 0; k < sc.lines.length; k++) if (t >= sc.lines[k].start) li = k;
+    const L = li >= 0 ? sc.lines[li] : null;
+    const speaking = L && t < L.start + L.dur ? L.spk : null;
+    let open = 0;
+    if (speaking) {
+      const f = (t - L.start) * TL.fps, a = Math.floor(f), b = a + 1, w = f - a;
+      const va = +(L.env[a] || 0), vb = +(L.env[b] || 0);
+      open = (va * (1 - w) + vb * w) / 9;
+    }
+    mouth(al, speaking === 'A' ? open : 0);
+    mouth(ar, speaking === 'R' ? open : 0);
+    // 字幕
+    let txt = '', who = '';
+    if (L && t < L.start + L.dur + 0.35) {
+      const lt2 = t - L.start; let ch = L.chunks[0];
+      for (const c of L.chunks) if (lt2 >= c.t) ch = c;
+      txt = ch ? ch.text : L.text; who = L.spk;
+    }
+    const key = who + txt;
+    if (key !== lastSub) { lastSub = key; subTxt.textContent = txt; subWho.textContent = who ? (who === 'A' ? 'Allan 老師' : '阿拉蕾') : ''; subWho.className = who === 'R' ? 'r' : ''; }
+    // 角色動作
+    const aS = speaking === 'A', rS = speaking === 'R';
+    const aBob = Math.sin(t * 1.9) * 3 - (aS ? Math.abs(Math.sin(t * 7.5)) * 4 * open : 0);
+    al.wrap.style.transform = `translateY(${aBob.toFixed(2)}px)`;
+    al.head.setAttribute('transform', `rotate(${(Math.sin(t*1.3)*2 + (aS? Math.sin(t*4.1)*2.5:0)).toFixed(2)} 110 170)`);
+    al.arm.setAttribute('transform', `rotate(${(aS ? Math.sin(t*2.3)*9 - 4 : Math.sin(t*1.1)*2).toFixed(2)} 66 190)`);
+    const aBlink = ((t + 0.7) % 3.9) < 0.13;
+    al.eyes.setAttribute('transform', aBlink ? 'translate(0 108) scale(1 .12) translate(0 -108)' : '');
+    const rHop = rS ? Math.abs(Math.sin(t * 6.2)) * 10 : 0;
+    ar.wrap.style.transform = `translateY(${(Math.sin(t*2.4+1)*3 - rHop).toFixed(2)}px) rotate(${(rS?Math.sin(t*3.1)*3:0).toFixed(2)}deg)`;
+    ar.arm.setAttribute('transform', `rotate(${(rS ? Math.sin(t*6)*22 : Math.sin(t*1.6)*6).toFixed(2)} 140 184)`);
+    ar.head.setAttribute('transform', `rotate(${(Math.sin(t*1.7+2)*3).toFixed(2)} 100 160)`);
+    const rBlink = ((t + 2.1) % 3.3) < 0.13;
+    ar.eyes.setAttribute('transform', rBlink ? 'translate(0 110) scale(1 .12) translate(0 -110)' : '');
+    // 背景與章節條
+    document.getElementById('bg').style.transform = `translate(${(-(t*6)%32).toFixed(1)}px, ${(-(t*3)%32).toFixed(1)}px)`;
+    TL.scenes.forEach((s, k) => { chapFills[k].style.width = (t >= s.end ? 100 : t <= s.start ? 0 : (t - s.start) / (s.end - s.start) * 100).toFixed(2) + '%'; });
+  }
+  window.TL = TL; window.renderAt = renderAt;
+
+  if (capture) { renderAt(0); window.__ready = document.fonts.ready.then(() => true); return; }
+
+  // ===== 互動播放器 =====
+  const fit = () => { stage.style.transform = `scale(${box.clientWidth / 1280})`; };
+  new ResizeObserver(fit).observe(box); fit();
+  const fmt = s => `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+  $('#dur').textContent = Math.round(TL.duration / 60);
+  const seek = $('#seek'), fill = $('#seekFill'), time = $('#time'), playBtn = $('#play');
+  seek.setAttribute('aria-valuemax', Math.round(TL.duration));
+  TL.scenes.forEach((s, k) => {
+    if (k) { const tk = document.createElement('div'); tk.className = 'tick'; tk.style.left = (s.start / TL.duration * 100) + '%'; seek.appendChild(tk); }
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = META[k].chapter;
+    b.onclick = () => go(s.start + 0.01); $('#chips').appendChild(b);
+  });
+  let clock = 0, playing = false;
+  const now = () => (aud.readyState >= 1 && !aud.error) ? aud.currentTime : clock;
+  function go(t){ t = Math.max(0, Math.min(TL.duration, t)); clock = t; try { aud.currentTime = t; } catch(e){} renderAt(t); }
+  function play(){ $('#cover').hidden = true; playing = true; playBtn.textContent = '❚❚ 暫停';
+    aud.playbackRate = +$('#rate').value; const p = aud.play(); if (p) p.catch(() => {}); }
+  function pause(){ playing = false; playBtn.textContent = '▶ 播放'; aud.pause(); }
+  $('#start').onclick = play;
+  playBtn.onclick = () => playing ? pause() : play();
+  $('#prev').onclick = () => { const t = now(); const i = sceneAt(t); go(TL.scenes[(t - TL.scenes[i].start < 2 && i > 0) ? i - 1 : i].start + 0.01); };
+  $('#next').onclick = () => { const i = sceneAt(now()); if (i < TL.scenes.length - 1) go(TL.scenes[i+1].start + 0.01); };
+  $('#rate').onchange = e => { aud.playbackRate = +e.target.value; };
+  $('#fs').onclick = () => { const el = $('.stage-box'); try { (document.fullscreenElement ? document.exitFullscreen() : el.requestFullscreen()).catch(()=>{}); } catch(e){} };
+  const seekTo = e => { const r = seek.getBoundingClientRect(); go((e.clientX - r.left) / r.width * TL.duration); };
+  seek.addEventListener('pointerdown', e => { seekTo(e); seek.setPointerCapture(e.pointerId); seek.onpointermove = seekTo; });
+  seek.addEventListener('pointerup', () => { seek.onpointermove = null; });
+  seek.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(now() + 5); if (e.key === 'ArrowLeft') go(now() - 5); });
+  document.addEventListener('keydown', e => { if (e.code === 'Space' && !/BUTTON|SELECT/.test(e.target.tagName)) { e.preventDefault(); playing ? pause() : play(); } });
+  aud.addEventListener('ended', pause);
+  let last = performance.now();
+  (function loop(ts){
+    const dt = (ts - last) / 1000; last = ts;
+    if (playing && (aud.readyState < 1 || aud.error)) { clock += dt * (+$('#rate').value); if (clock >= TL.duration) pause(); }
+    const t = now();
+    renderAt(t);
+    fill.style.width = (t / TL.duration * 100) + '%';
+    seek.setAttribute('aria-valuenow', Math.round(t));
+    time.textContent = `${fmt(t)} / ${fmt(TL.duration)}`;
+    requestAnimationFrame(loop);
+  })(last);
+  go(0);
+})();
+</script>

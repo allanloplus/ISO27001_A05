@@ -1,0 +1,910 @@
+<title>身分與存取管理動畫課</title>
+<meta name="description" content="ISO 27001:2022 身分與存取管理：ISMS 作業重點、稽核查核重點、常見缺失｜Allan Lo 講師 × 阿拉蕾助教">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<style>
+/* 版面概念：16:9 舞台 = 上方流程燈號列＋左側教學內容區＋右側 Q 版講師／助教＋下方字幕列
+   單一明亮「教室白板」風格（影片畫面不隨深淺色主題變動），外框為深色放映廳 */
+:root{
+  color-scheme: dark;
+  --ink:#1d2b3a; --paper:#fbfdfc; --board:#eef6f3; --grid:#d6e9e2;
+  --teal:#0f9f8a; --teal-d:#0f766e; --blue:#2f6fde; --violet:#7c4dcc;
+  --amber:#f2a516; --amber-d:#b45309; --red:#e5484d; --red-d:#b91c1c; --green:#16a34a;
+  --allan:#1f3a68; --arale:#7c4dcc;
+  --hall:#0d1520; --hall-2:#16212f; --hall-fg:#e6edf5; --hall-mute:#93a4b8;
+  --f-body:"Noto Sans TC","WenQuanYi Zen Hei","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-disp:"Fredoka","Noto Sans TC","WenQuanYi Zen Hei",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--hall);color:var(--hall-fg);font-family:var(--f-body);-webkit-font-smoothing:antialiased}
+.page{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding-block:12px;padding-inline:16px}
+.player{width:min(100%, calc((100vh - 120px) * 16 / 9));min-width:0}
+.stage-box{position:relative;width:100%;aspect-ratio:16/9;max-width:100%;overflow:hidden;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.45);background:var(--board)}
+#stage{position:absolute;left:0;top:0;width:1280px;height:720px;transform-origin:0 0;overflow:hidden;background:var(--board);color:var(--ink);font-family:var(--f-body)}
+body.capture{background:var(--board)}
+body.capture .page{padding:0;display:block}
+body.capture .player{width:1280px}
+body.capture .stage-box{width:1280px;height:720px;border-radius:0;box-shadow:none;aspect-ratio:auto}
+body.capture .controls, body.capture #cover{display:none!important}
+
+/* 背景格線 */
+#bg{position:absolute;inset:-40px;background-image:radial-gradient(var(--grid) 2px, transparent 2.5px);background-size:32px 32px}
+#bg2{position:absolute;right:-120px;top:120px;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle at 40% 40%, #d7f3ea, transparent 65%)}
+
+/* ===== 標頭 ===== */
+#hdr{position:absolute;left:0;top:0;width:1280px;height:62px;background:#fff;border-bottom:3px solid var(--ink);display:flex;align-items:center;gap:0;padding-left:16px;z-index:5}
+.logo{font:700 15px/1.15 var(--f-disp);color:var(--teal-d);width:150px;letter-spacing:.02em}
+.logo b{display:block;font:900 19px/1.1 var(--f-body);color:var(--ink)}
+.chevs{display:flex;margin-left:6px}
+.chevs div{height:46px;width:262px;display:flex;align-items:center;justify-content:center;font:700 17px var(--f-body);color:#7c8b98;background:#e3ece9;
+  clip-path:polygon(0 0,calc(100% - 18px) 0,100% 50%,calc(100% - 18px) 100%,0 100%,18px 50%);margin-left:-10px;transition:none}
+.chevs div:first-child{clip-path:polygon(0 0,calc(100% - 18px) 0,100% 50%,calc(100% - 18px) 100%,0 100%);margin-left:0}
+.chevs div.on{color:#fff;background:linear-gradient(90deg,#14b88f,#0f9f8a)}
+.chevs div.on.cur{background:linear-gradient(90deg,#0ea371,#057a63);box-shadow:inset 0 -4px 0 #ffd84d}
+#facet{margin-left:auto;margin-right:16px;padding:7px 16px;border-radius:999px;border:3px solid var(--ink);font:900 17px var(--f-body);background:#fff;white-space:nowrap}
+#facet.k-isms{background:#d1fae5}#facet.k-audit{background:#fde68a}#facet.k-nc{background:#fecaca}#facet.k-sum{background:#e0e7ff}#facet:empty{display:none}
+
+/* ===== 場景 ===== */
+.scene{position:absolute;left:0;top:0;width:1280px;height:720px;display:none;animation:sceneIn .6s cubic-bezier(.2,.8,.2,1) 0s both}
+.scene.on{display:block}
+.content{position:absolute;left:28px;top:80px;width:850px;height:500px}
+
+/* 動畫關鍵影格（由播放器依語音時間軸控制） */
+@keyframes sceneIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{opacity:0;transform:scale(.6)}70%{opacity:1;transform:scale(1.06)}100%{opacity:1;transform:scale(1)}}
+@keyframes up{from{opacity:0;transform:translateY(34px)}to{opacity:1;transform:none}}
+@keyframes left{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:none}}
+@keyframes right{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes zoom{0%{opacity:0;transform:scale(.2)}65%{opacity:1;transform:scale(1.08)}100%{opacity:1;transform:scale(1)}}
+@keyframes stampS{0%{opacity:0;transform:scale(2.2) rotate(2deg)}60%{opacity:1;transform:scale(.97) rotate(-2deg)}100%{opacity:1;transform:scale(1) rotate(-1deg)}}
+@keyframes stamp{0%{opacity:0;transform:scale(3) rotate(-4deg)}60%{opacity:1;transform:scale(.92) rotate(-10deg)}100%{opacity:1;transform:scale(1) rotate(-8deg)}}
+@keyframes wipe{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes out{from{opacity:1}to{opacity:0;transform:scale(.97)}}
+@keyframes hl{0%,100%{transform:scale(1)}30%{transform:scale(1.08);filter:drop-shadow(0 0 10px #ffd84d)}60%{transform:scale(1.02)}}
+
+/* ===== 共用元件 ===== */
+.ic{flex:none;vertical-align:middle}
+.tag{display:inline-flex;align-items:center;justify-content:center;min-width:52px;height:30px;padding:0 9px;margin-right:9px;border-radius:9px;background:var(--teal);color:#fff;font:700 18px var(--f-disp);letter-spacing:.02em;border:2px solid var(--ink)}
+.tag.t-red{background:var(--red)}
+.card{background:#fff;border:3px solid var(--ink);border-radius:18px;box-shadow:5px 5px 0 var(--ink);padding:14px 16px}
+.card h3{margin:0 0 10px;font:900 24px/1.2 var(--f-body);display:flex;align-items:center;gap:6px}
+ul.b{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px}
+ul.b li{position:relative;padding-left:22px;font:500 19px/1.38 var(--f-body)}
+ul.b li::before{content:"";position:absolute;left:3px;top:.55em;width:10px;height:10px;border-radius:50%;background:var(--teal);border:2px solid var(--ink)}
+ul.b.sm li{font-size:17px;line-height:1.36}
+b{font-weight:900}
+.scene-h{position:absolute;left:0;top:0;margin:0;display:flex;align-items:center;gap:10px;font:900 32px var(--f-body);color:var(--ink)}
+.scene-h.amber .ic{stroke:var(--amber-d)}
+.take{position:absolute;left:0;bottom:0;width:850px;height:50px;border-radius:14px;background:var(--ink);color:#fff;display:flex;align-items:center;padding:0 18px;font:700 21px var(--f-body);gap:6px}
+.take b{color:#ffd84d}
+.case{position:absolute;left:0;top:0;width:850px;padding-bottom:18px;background:#fff8ec;border:3px solid var(--ink);border-radius:20px;box-shadow:7px 7px 0 var(--ink);overflow:hidden}
+.case-h{display:flex;align-items:center;gap:10px;height:52px;padding:0 18px;background:var(--amber);color:#fff;font:900 23px var(--f-body);border-bottom:3px solid var(--ink);text-shadow:0 1px 0 rgba(0,0,0,.25)}
+.fixbox{margin:0 18px;background:#ecfdf3;border:3px solid var(--green);border-radius:16px;padding:12px 16px}
+.fix-h{display:flex;align-items:center;gap:8px;font:900 21px var(--f-body);color:#15803d;margin-bottom:10px}
+.stampx,.seal,.rank,.bye,.quiz-a,.hero,.sticker{display:inline-block;border:4px solid var(--red);color:var(--red);font:900 24px var(--f-body);padding:2px 12px;border-radius:10px;background:rgba(255,255,255,.85);transform:rotate(-8deg)}
+
+/* ===== S0 開場 ===== */
+.title-wrap{position:absolute;inset:0;padding:22px 10px 0}
+.eyebrow{font:700 18px var(--f-body);color:var(--teal-d);letter-spacing:.04em}
+.big-title{margin:8px 0 0;font:900 84px/1.08 var(--f-body);letter-spacing:.02em;color:var(--ink);text-shadow:4px 4px 0 #bfeee0}
+.hl-y{background:linear-gradient(transparent 58%, #ffe066 58%)}
+.sub-title{font:600 32px var(--f-disp);color:var(--blue);margin-top:6px}
+.facets{display:flex;gap:16px;margin-top:24px}
+.facet{display:flex;align-items:center;gap:10px;height:66px;padding:0 20px;border-radius:16px;border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);color:#fff;font-size:24px}
+.facet.f1{background:var(--teal)}.facet.f2{background:var(--amber)}.facet.f3{background:var(--red)}
+.intro-row{display:flex;gap:16px;margin-top:26px}
+.badge-name{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;white-space:nowrap;padding:10px 16px;border-radius:14px;background:#fff;border:3px solid var(--ink);font:900 26px var(--f-body)}
+.badge-name small{font:700 15px var(--f-body);color:#fff;padding:2px 8px;border-radius:6px;background:var(--allan)}
+.badge-name.pp small{background:var(--arale)}
+.badge-name em{flex-basis:100%;font:500 15px var(--f-body);font-style:normal;color:#526170}
+.sticker{position:absolute;right:6px;top:118px;font-size:22px;line-height:1.25;text-align:center;padding:10px 16px;border-color:var(--blue);color:var(--blue)}
+
+/* ===== S1 全景 ===== */
+.map{position:absolute;left:0;top:62px;width:850px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.map-col{background:#fff;border:3px solid var(--ink);border-radius:16px;box-shadow:4px 4px 0 var(--ink);padding:0 0 10px;display:flex;flex-direction:column;gap:9px;overflow:hidden}
+.chev{background:linear-gradient(90deg,#14b88f,#0f9f8a);color:#fff;font:900 18px var(--f-body);padding:11px 12px;border-bottom:3px solid var(--ink);text-align:center}
+.c2 .chev{background:linear-gradient(90deg,#3b82f6,#2f6fde)}.c3 .chev{background:linear-gradient(90deg,#8b5cf6,#7c4dcc)}
+.c2 .tag{background:var(--blue)}.c3 .tag{background:var(--violet)}
+.chip{display:flex;align-items:center;margin:0 10px;padding:6px 8px;border-radius:12px;background:#f2f7f5;font:700 19px var(--f-body)}
+.chip .tag{min-width:48px;height:28px;font-size:16px}
+.c2 .chip .tag.t-red{background:var(--red)}
+.fixchip{background:#fff1f1;outline:2px dashed var(--red)}
+.col-note{margin:2px 12px 0;font:900 17px var(--f-body);color:#64748b;text-align:right}
+.correction{position:absolute;left:0;top:388px;width:476px;padding:10px 14px;border:3px solid var(--red);border-radius:14px;background:#fff;font:500 18px/1.45 var(--f-body);transform:rotate(-1deg)}
+.correction b{color:#fff;background:var(--red);padding:1px 8px;border-radius:6px;margin-right:6px}
+.correction u{text-decoration:none;color:var(--red);font:700 22px var(--f-disp)}
+.correction small{color:#526170;font-size:15px}
+.slogan{position:absolute;left:490px;top:388px;width:330px;height:96px;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 14px;border-radius:14px;background:var(--ink);color:#ffd84d;font:900 22px/1.4 var(--f-body)}
+
+/* ===== S2 第一段 ===== */
+.principle{position:absolute;left:0;top:0;width:850px;height:64px;border-radius:16px;background:var(--teal-d);border:3px solid var(--ink);display:flex;align-items:center;justify-content:center;gap:18px;color:#fff;font:900 25px var(--f-body)}
+.principle span{display:flex;align-items:center;gap:8px}
+.principle i{font:600 17px var(--f-disp);font-style:normal;opacity:.85}
+.principle .plus{color:#ffd84d;font-size:30px}
+.cards3{position:absolute;left:0;top:84px;width:850px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cards3 .card{min-height:262px}
+.k2 h3 .tag{background:var(--amber)}.k3 h3 .tag{background:var(--blue)}
+.note-bubble{position:absolute;left:250px;top:372px;padding:12px 18px;border-radius:18px;background:#fff7d6;border:3px solid var(--ink);font:500 20px var(--f-body);box-shadow:4px 4px 0 var(--ink)}
+.case-body{display:grid;grid-template-columns:330px 1fr;grid-template-rows:auto 1fr;gap:12px 18px;padding:16px 18px}
+.who{display:flex;flex-direction:column;gap:10px}
+.avatar{display:flex;align-items:center;gap:10px;font:900 22px var(--f-body)}
+.avatar .ic{background:#e2e8f0;border-radius:50%;padding:6px;border:3px solid var(--ink)}
+.perm{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:12px;background:#fff;border:3px solid #b45309;font:700 20px var(--f-body)}
+.risk{grid-column:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;background:#fee2e2;border:3px solid var(--red);color:var(--red-d);font:900 19px var(--f-body)}
+.sod{grid-column:2;grid-row:1 / span 2;background:#fff;border:3px solid var(--ink);border-radius:16px;padding:12px 14px}
+.sod-h{font:900 20px var(--f-body);margin-bottom:8px;color:#15803d}
+.sod table{border-collapse:collapse;width:100%;font:700 17px var(--f-body);text-align:center}
+.sod th,.sod td{border:2px solid #cbd5e1;padding:8px 4px}
+.sod th{background:#f1f5f9}
+.sod td.ng{background:#fee2e2;color:var(--red);font-size:24px}
+.sod td.ok{color:var(--green);font-size:22px}
+.sod-f{margin-top:10px;font:500 18px var(--f-body)}
+.sod-f b{color:#15803d}
+
+/* ===== S3 第二段 ===== */
+.jml{position:absolute;left:0;top:0;width:300px;height:300px}
+.jml-ring{position:absolute;inset:0;width:300px;height:300px;transform:rotate(-90deg)}
+.ring-draw{stroke-dasharray:1}
+.jml-c{position:absolute;left:100px;top:118px;width:100px;text-align:center;font:900 22px/1.25 var(--f-body);color:var(--blue)}
+.jml-n{position:absolute;width:104px;height:104px;border-radius:50%;background:var(--blue);border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}
+.jml-n b{font-size:21px}.jml-n i{font:600 14px var(--f-disp);font-style:normal;opacity:.9}
+.jml-n.n1{left:98px;top:-6px}.jml-n.n2{left:194px;top:150px;background:var(--teal)}.jml-n.n3{left:2px;top:150px;background:var(--red)}
+.grid4{position:absolute;left:322px;top:0;width:528px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card.mini{padding:11px 13px;min-height:200px}
+.card.mini h3{font-size:21px;margin-bottom:8px}
+.card.mini .tag{background:var(--blue)}
+.card.mini .tag.t-red{background:var(--red)}
+.grid4 ul.b.sm li{font-size:16px}
+.postit{position:absolute;left:40px;top:318px;width:210px;padding:16px;background:#fff59d;border:2px solid #d4b106;box-shadow:4px 6px 0 rgba(0,0,0,.18);font:500 20px/1.4 var(--f-body);transform:rotate(-4deg)}
+.postit b{font:700 28px var(--f-disp)}
+.postit .stampx{position:absolute;right:-26px;bottom:-14px}
+.creep{position:absolute;left:12px;top:310px;width:290px;padding:10px 14px;background:#fff;border:3px solid var(--ink);border-radius:16px;box-shadow:4px 4px 0 var(--ink)}
+.creep-h{font:900 18px var(--f-body);color:var(--red-d)}
+.bars{display:flex;align-items:flex-end;gap:16px;height:100px;margin:8px 0 4px;padding:0 6px}
+.bar{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;font:700 14px var(--f-body)}
+.bar i{display:block;width:100%;border-radius:6px 6px 0 0;background:#93c5fd;border:2px solid var(--ink)}
+.bar i.hot{background:var(--red)}
+.creep-f{font:900 17px var(--f-body);text-align:right}
+.tl{display:flex;align-items:center;gap:8px;padding:22px 18px 18px}
+.tl-i{flex:1;padding:12px;border-radius:14px;background:#fff;border:3px solid var(--ink);font:500 18px/1.35 var(--f-body);text-align:center}
+.tl-i b{display:block;font:700 22px var(--f-disp);color:var(--blue)}
+.tl-i.warn b{color:var(--amber-d)}.tl-i.bad{background:#fee2e2;border-color:var(--red)}.tl-i.bad b{color:var(--red)}
+.tl-a{font:900 26px var(--f-body);color:#64748b}
+.fix-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fix-i{display:flex;align-items:flex-start;gap:8px;background:#fff;border:2px solid #86efac;border-radius:12px;padding:10px 12px;font:700 18px/1.4 var(--f-body)}
+.fix-i small{font-weight:500;color:#475569;font-size:15px}
+
+/* ===== S4 第三段 ===== */
+.hubmap{position:absolute;left:0;top:0;width:850px;height:438px}
+.spokes{position:absolute;inset:0;width:850px;height:438px}
+.spokes path{fill:none;stroke:#f2a516;stroke-width:6;stroke-dasharray:1;stroke-linecap:round}
+.hub{position:absolute;left:363px;top:155px;width:124px;height:124px;border-radius:50%;background:var(--ink);border:4px solid #f2a516;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font:900 22px var(--f-body)}
+.hero{position:absolute;top:-30px;right:-58px;font-size:20px;border-color:var(--violet);color:var(--violet)}
+.spot{position:absolute;width:340px;background:#fff;border:3px solid var(--ink);border-radius:16px;box-shadow:4px 4px 0 var(--ink);padding:11px 13px}
+.spot h3{margin:0 0 7px;font:900 20px var(--f-body);display:flex;align-items:center}
+.spot .tag{background:var(--violet);min-width:46px;height:28px;font-size:16px}
+.spot ul.b.sm li{font-size:16px}
+.spot code{font:600 16px var(--f-disp);background:#f1f5f9;padding:1px 6px;border-radius:6px}
+.s-tl{left:0;top:0}.s-tr{right:0;top:0}.s-bl{left:0;bottom:0}.s-br{right:0;bottom:0}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:20px 18px 16px}
+.fact{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;background:#fff;border:3px solid var(--red);border-radius:14px;font:500 19px var(--f-body);text-align:center}
+.flow{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
+.flow span{display:flex;align-items:center;gap:5px;padding:9px 10px;border-radius:12px;background:#fff;border:2px solid #86efac;font:700 17px var(--f-body);white-space:nowrap}
+.flow em{font-style:normal;color:#15803d;font-weight:900}
+
+/* ===== S5 稽核 ===== */
+.scene-h.amber{color:#7c3e06}
+.audit3{position:absolute;left:0;top:60px;width:850px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card.au{position:relative;min-height:268px;padding-top:16px}
+.card.au h3{color:#7c3e06}
+.au-no{position:absolute;right:12px;top:-16px;width:40px;height:40px;border-radius:50%;background:var(--amber);border:3px solid var(--ink);color:#fff;font:700 22px var(--f-disp);display:flex;align-items:center;justify-content:center}
+.card.au ul.b li::before{background:var(--amber)}
+.cmp{display:flex;align-items:center;gap:6px}
+.cmp-l{flex:1;display:flex;flex-direction:column;gap:4px;font:500 15px var(--f-body)}
+.cmp-l b{font-size:14px;color:#475569}
+.cmp-l span{background:#f1f5f9;border-radius:6px;padding:2px 6px;font-family:var(--f-disp)}
+.cmp-l span.del{text-decoration:line-through;color:#94a3b8}
+.cmp-l span.g{background:#ede9fe;color:var(--violet);font-weight:700}
+.cmp-x{font:900 22px var(--f-body);color:#64748b}
+.ghost{position:absolute;right:-14px;bottom:-20px;display:flex;align-items:center;gap:4px;padding:6px 10px;border-radius:12px;background:#f5f3ff;border:3px solid var(--violet);color:var(--violet);font:900 19px var(--f-body);transform:rotate(6deg)}
+.ask{margin-top:12px;padding:8px 10px;border-radius:10px;background:#fff7d6;border:2px solid var(--amber);font:500 15px/1.4 var(--f-body)}
+.seal{position:absolute;right:18px;bottom:22px;font-size:26px}
+.onsite{position:absolute;left:0;top:350px;width:850px;display:flex;align-items:center;gap:10px;flex-wrap:nowrap}
+.onsite>b{font:900 19px var(--f-body);padding:8px 12px;border-radius:10px;background:var(--ink);color:#fff;white-space:nowrap}
+.onsite span{display:flex;align-items:center;gap:5px;padding:7px 10px;border-radius:10px;background:#fff;border:2px solid var(--ink);font:700 15px var(--f-body);white-space:nowrap}
+.four{position:absolute;left:0;top:420px;width:850px;height:62px;border-radius:16px;background:var(--amber);border:3px solid var(--ink);display:flex;align-items:center;justify-content:center;gap:10px;font:900 24px var(--f-body);color:var(--ink)}
+.four b{background:#fff;border:2px solid var(--ink);border-radius:10px;padding:2px 12px}
+.four em{font-style:normal}
+
+/* ===== S6 缺失 ===== */
+.scene-h.red{color:var(--red-d)}
+.nc-grid{position:absolute;left:0;top:62px;width:850px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.nc{position:relative;height:196px;background:#fff;border:3px solid var(--ink);border-radius:16px;box-shadow:4px 4px 0 var(--ink);padding:12px 12px 10px;display:flex;flex-direction:column;gap:8px}
+.nc-no{position:absolute;left:-10px;top:-12px;width:36px;height:36px;border-radius:50%;background:var(--red);border:3px solid var(--ink);color:#fff;font:700 20px var(--f-disp);display:flex;align-items:center;justify-content:center}
+.nc-t{font:900 20px/1.3 var(--f-body);padding-left:16px;min-height:52px}
+.nc-c .tag{font-size:15px;height:26px;min-width:44px}
+.nc-d{font:500 15.5px/1.42 var(--f-body);color:#3b4757}
+.rank{position:absolute;right:-8px;top:-18px;font:700 22px var(--f-disp);background:#ffd84d;border-color:var(--red-d);color:var(--red-d)}
+.homework{position:absolute;left:640px;top:276px;width:200px;padding:14px;background:#fff59d;border:2px solid #d4b106;box-shadow:4px 6px 0 rgba(0,0,0,.18);font:700 20px/1.4 var(--f-body);transform:rotate(4deg);z-index:2}
+.homework small{font-weight:500;color:#64748b}
+.quiz{position:absolute;left:30px;top:40px;width:790px;height:400px;background:#fff;border:4px solid var(--ink);border-radius:22px;box-shadow:8px 8px 0 var(--ink);padding:0 26px}
+.quiz-h{margin:0 -26px;height:58px;display:flex;align-items:center;justify-content:center;background:var(--violet);color:#fff;font:900 28px var(--f-body);border-radius:18px 18px 0 0;border-bottom:4px solid var(--ink);letter-spacing:.1em}
+.quiz-q{margin-top:22px;padding-right:200px;font:500 25px/1.55 var(--f-body)}
+.quiz-a{position:absolute;right:34px;top:96px;font-size:54px;padding:4px 22px;border-width:6px}
+.quiz-why{position:absolute;left:26px;right:26px;bottom:24px;display:flex;gap:10px;align-items:flex-start;padding:14px 16px;border-radius:14px;background:#ecfdf3;border:3px solid var(--green);font:500 20px/1.5 var(--f-body)}
+
+/* ===== S7 總結 ===== */
+.sum3{position:absolute;left:0;top:62px;width:850px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.sum3 .card{min-height:230px}
+.sm2 ul.b li::before{background:var(--amber)}.sm3 ul.b li::before{background:var(--red)}
+.motto{position:absolute;left:0;top:322px;width:850px;padding:18px;text-align:center;border-radius:18px;background:var(--ink);color:#fff;font:700 27px/1.5 var(--f-body)}
+.motto b{color:#ffd84d}
+.bye{position:absolute;left:300px;top:418px;font-size:34px;border-color:var(--teal);color:var(--teal-d)}
+
+/* ===== 角色 ===== */
+.char{position:absolute;will-change:transform}
+#allanWrap{left:1000px;top:286px;width:270px;height:300px;z-index:3}
+#araleWrap{left:858px;top:372px;width:168px;height:232px;z-index:4}
+.char svg{width:100%;height:100%;overflow:visible}
+.mouthO{transform-box:fill-box;transform-origin:center}
+.char .nametag{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);font:900 14px var(--f-body);color:#fff;padding:1px 10px;border-radius:999px;border:2px solid var(--ink);white-space:nowrap}
+
+/* ===== 字幕 ===== */
+#sub{position:absolute;left:28px;top:604px;width:1224px;height:94px;background:#fff;border:3px solid var(--ink);border-radius:18px;box-shadow:0 5px 0 var(--ink);display:flex;align-items:center;gap:16px;padding:0 22px;z-index:6}
+#subWho{flex:none;min-width:104px;text-align:center;padding:6px 12px;border-radius:12px;color:#fff;font:900 20px var(--f-body);background:var(--allan)}
+#subWho.r{background:var(--arale)}
+#subWho:empty{visibility:hidden}
+#subTxt{font:700 28px/1.38 var(--f-body);color:var(--ink);min-width:0}
+#chap{position:absolute;left:0;top:713px;width:1280px;height:7px;display:flex;gap:3px;z-index:7}
+#chap div{position:relative;height:100%;background:#c9dad4;overflow:hidden}
+#chap div i{position:absolute;left:0;top:0;bottom:0;background:var(--teal)}
+
+/* ===== 封面（互動播放前） ===== */
+#cover{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(13,21,32,.55);backdrop-filter:blur(2px)}
+#cover button{font:900 30px var(--f-body);padding:16px 38px;border-radius:999px;border:4px solid var(--ink);background:#ffd84d;color:var(--ink);box-shadow:0 6px 0 var(--ink);cursor:pointer}
+#cover button:focus-visible{outline:4px solid #fff;outline-offset:4px}
+#cover p{margin:0;color:#fff;font:500 18px var(--f-body)}
+
+/* ===== 控制列 ===== */
+.controls{width:100%;display:flex;flex-direction:column;gap:8px;color:var(--hall-fg)}
+.bar-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.controls button,.controls select{font:700 14px var(--f-body);color:var(--hall-fg);background:var(--hall-2);border:1px solid #2b3a4d;border-radius:10px;padding:8px 12px;cursor:pointer;min-height:38px}
+.controls button:hover,.controls select:hover{border-color:var(--teal)}
+.controls button:focus-visible,.controls select:focus-visible,#seek:focus-visible{outline:2px solid #ffd84d;outline-offset:2px}
+#play{min-width:84px;background:var(--teal);border-color:var(--teal);color:#fff}
+#seek{position:relative;flex:1 1 240px;min-width:0;height:12px;border-radius:6px;background:#26354a;cursor:pointer}
+#seekFill{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:var(--teal)}
+.tick{position:absolute;top:-3px;width:3px;height:18px;background:#ffd84d;border-radius:2px;pointer-events:none}
+#time{font:600 14px var(--f-disp);color:var(--hall-mute);font-variant-numeric:tabular-nums;white-space:nowrap}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips button{font-size:13px;padding:6px 10px;min-height:32px}
+.chips button.cur{background:#ffd84d;color:var(--ink);border-color:#ffd84d}
+@media (prefers-reduced-motion: reduce){ #cover{backdrop-filter:none} }
+</style>
+
+<div class="page">
+  <div class="player">
+    <div class="stage-box" id="box">
+      <div id="stage">
+        <div id="bg"></div><div id="bg2"></div>
+        <header id="hdr">
+          <div class="logo">ISO 27001:2022<b>身分與存取管理</b></div>
+          <div class="chevs"><div data-s="1">基於業務營運之存取要求</div><div data-s="2">使用者存取管理</div><div data-s="3">系統、應用、實體存取管理</div></div>
+          <div id="facet"></div>
+        </header>
+        <section class="scene" data-i="0"><div class="content">
+  <div class="title-wrap">
+    <div class="eyebrow" data-in="fade 0 0">ISO/IEC 27001:2022 控制屬性｜運作能力 Operational capabilities</div>
+    <h1 class="big-title" data-in="zoom 0 0.3">身分與<span class="hl-y">存取管理</span></h1>
+    <div class="sub-title" data-in="up 0 0.8">Identity &amp; Access Management</div>
+    <div class="facets">
+      <div class="facet f1" data-in="pop 4 1.2"><svg class="ic" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg><b>ISMS 作業重點</b></div>
+      <div class="facet f2" data-in="pop 4 2.6"><svg class="ic" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><b>稽核查核重點</b></div>
+      <div class="facet f3" data-in="pop 4 3.7"><svg class="ic" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg><b>常見的缺失</b></div>
+    </div>
+    <div class="intro-row">
+      <div class="badge-name nv" data-in="left 0 1.2"><small>講師</small>Allan Lo<em>ISMS／PIMS 輔導顧問・驗證公司稽核員</em></div>
+      <div class="badge-name pp" data-in="left 1 0"><small>助教</small>阿拉蕾<em>好奇心滿點的機器人助教</em></div>
+    </div>
+    <div class="sticker" data-in="stamp 5 0.5">輔導 × 稽核<br>雙視角實戰</div>
+  </div></div></section>
+<section class="scene" data-i="1"><div class="content">
+  <h2 class="scene-h" data-in="left 0 0"><svg class="ic" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#0f766e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h1M3 12h1M3 18h1"/></svg>存取管理三段式流程</h2>
+  <div class="map">
+    <div class="map-col c1" data-in="up 1 0">
+      <div class="chev">基於業務營運之存取要求</div>
+      <div class="chip" data-in="pop 1 3.2"><span class="tag ">5.15</span>存取控制</div>
+      <div class="chip" data-in="pop 1 4.6"><span class="tag ">5.3</span>職務區隔</div>
+      <div class="chip" data-in="pop 1 6"><span class="tag ">5.37</span>書面紀錄之運作程序</div>
+      <div class="col-note">先定規則</div>
+    </div>
+    <div class="map-col c2" data-in="up 2 0">
+      <div class="chev">使用者存取管理</div>
+      <div class="chip" data-in="pop 2 2.6"><span class="tag ">5.16</span>身分管理</div>
+      <div class="chip" data-in="pop 2 3.8"><span class="tag ">5.17</span>鑑別資訊</div>
+      <div class="chip" data-in="pop 2 5"><span class="tag ">5.18</span>存取權限</div>
+      <div class="chip fixchip" data-in="pop 2 6.4" data-hl="4"><span class="tag t-red">8.5</span>安全鑑別</div>
+      <div class="col-note">再管身分</div>
+    </div>
+    <div class="map-col c3" data-in="up 5 0">
+      <div class="chev">系統、應用、實體存取管理</div>
+      <div class="chip" data-in="pop 5 2.6"><span class="tag ">7.2</span>實體進入</div>
+      <div class="chip" data-in="pop 5 3.8"><span class="tag ">8.2</span>特殊存取權限</div>
+      <div class="chip" data-in="pop 5 5"><span class="tag ">8.3</span>資訊存取限制</div>
+      <div class="chip" data-in="pop 5 6.2"><span class="tag ">8.4</span>對原始碼之存取</div>
+      <div class="col-note">守住每一道門</div>
+    </div>
+  </div>
+  <div class="correction" data-in="stampS 4 0.6">
+    <b>編號更正</b>「安全鑑別」是 <u>8.5</u>，不是 5.17<br>
+    <small>5.17 管密碼等鑑別資訊本身；8.5 管登入機制（MFA、鎖定…）</small>
+  </div>
+  <div class="slogan" data-in="wipe 7 0.8">先定規則 ➜ 再管身分<br>➜ 守住每一道門</div></div></section>
+<section class="scene" data-i="2"><div class="content">
+  <div class="principle" data-in="zoom 0 0.4" data-out="7">
+    <span><svg class="ic" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l8-8M16 7l3 3M14 9l2 2"/></svg>最小權限 <i>Least privilege</i></span>
+    <span class="plus">＋</span>
+    <span><svg class="ic" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>有需要才知道 <i>Need-to-know</i></span>
+  </div>
+  <div class="cards3" data-in="fade 1 0" data-out="7">
+    <div class="card k1" data-in="up 1 0">
+      <h3><span class="tag ">5.15</span>存取控制</h3>
+      <ul class="b">
+        <li data-in="left 1 2">訂定<b>存取控制政策</b></li>
+        <li data-in="left 1 4">依業務與資安要求決定誰、存取什麼、怎麼存取</li>
+        <li data-in="left 2 0.3">涵蓋<b>實體</b>＋<b>邏輯</b>兩層面</li>
+      </ul>
+    </div>
+    <div class="card k2" data-in="up 3 0">
+      <h3><span class="tag ">5.3</span>職務區隔</h3>
+      <ul class="b">
+        <li data-in="left 3 1.4">衝突職務要拆開，<b>不能球員兼裁判</b></li>
+        <li data-in="left 3 3.6">申請者 ≠ 核准者 ≠ 執行者</li>
+        <li data-in="left 6 0.5">人力不足 ➜ <b>補償控制</b></li>
+      </ul>
+    </div>
+    <div class="card k3" data-in="up 4 0">
+      <h3><span class="tag ">5.37</span>書面運作程序</h3>
+      <ul class="b">
+        <li data-in="left 4 2">開通、異動、刪除寫成程序</li>
+        <li data-in="left 4 4.5"><b>拿得到、看得懂、照著做</b></li>
+        <li data-in="left 4 6">程序 = 實際作法</li>
+      </ul>
+    </div>
+  </div>
+  <div class="note-bubble" data-in="pop 6 1.2" data-out="7">小公司補償控制：<b>完整操作日誌</b>＋<b>主管定期覆核</b></div>
+
+  <div class="case" data-in="zoom 7 0">
+    <div class="case-h"><svg class="ic" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 7h2M14 7h2M8 11h2M14 11h2M8 15h2M14 15h2"/></svg>實際案例｜製造業 ERP 權限</div>
+    <div class="case-body">
+      <div class="who">
+        <div class="avatar"><svg class="ic" viewBox="0 0 24 24" width="54" height="54" fill="none" stroke="#334155" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>會計 A 同仁</span></div>
+        <div class="perm" data-in="right 7 2.2"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#b45309" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l8-8M16 7l3 3M14 9l2 2"/></svg>新增供應商主檔</div>
+        <div class="perm" data-in="right 7 3.4"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#b45309" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l8-8M16 7l3 3M14 9l2 2"/></svg>執行付款</div>
+      </div>
+      <div class="risk" data-in="pop 8 0.4">
+        <svg class="ic" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg>風險：建立假廠商 ➜ 付款給自己
+      </div>
+      <div class="sod" data-in="up 9 2.6">
+        <div class="sod-h">改善：職務衝突矩陣（SoD Matrix）</div>
+        <table>
+          <tr><th></th><th>主檔維護</th><th>請購核准</th><th>執行付款</th></tr>
+          <tr><th>主檔維護</th><td>—</td><td class="ok">○</td><td class="ng">✕</td></tr>
+          <tr><th>請購核准</th><td class="ok">○</td><td>—</td><td class="ng">✕</td></tr>
+          <tr><th>執行付款</th><td class="ng">✕</td><td class="ng">✕</td><td>—</td></tr>
+        </table>
+        <div class="sod-f">ERP 設定<b>互斥角色</b>，系統直接擋</div>
+      </div>
+    </div>
+  </div>
+  <div class="take" data-in="wipe 10 0.4">第一段三把鑰匙：<b>政策先行・衝突拆分・程序落地</b></div></div></section>
+<section class="scene" data-i="3"><div class="content">
+  <div class="jml" data-in="fade 0 0" data-out="9">
+    <svg viewBox="0 0 300 300" class="jml-ring" aria-hidden="true">
+      <circle cx="150" cy="150" r="104" fill="none" stroke="#bfdbfe" stroke-width="14"/>
+      <circle cx="150" cy="150" r="104" fill="none" stroke="#3b82f6" stroke-width="14" stroke-linecap="round" pathLength="1" class="ring-draw" data-in="draw 0 1"/>
+    </svg>
+    <div class="jml-c">帳號<br>生命週期</div>
+    <div class="jml-n n1" data-in="pop 0 3.5"><svg class="ic" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><b>到職</b><i>Joiner</i></div>
+    <div class="jml-n n2" data-in="pop 0 4.4"><svg class="ic" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg><b>異動</b><i>Mover</i></div>
+    <div class="jml-n n3" data-in="pop 0 5.4"><svg class="ic" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="3" width="12" height="18" rx="1"/><circle cx="15" cy="12" r="1"/><path d="M3 21h18"/></svg><b>離職</b><i>Leaver</i></div>
+  </div>
+  <div class="grid4" data-in="fade 1 0" data-out="9">
+    <div class="card mini" data-in="up 1 0">
+      <h3><span class="tag ">5.16</span>身分管理</h3>
+      <ul class="b sm"><li><b>一人一號</b>，責任追得到</li><li>共用帳號原則禁止；必要時核准＋使用紀錄</li></ul>
+    </div>
+    <div class="card mini" data-in="up 3 1.6">
+      <h3><span class="tag ">5.17</span>鑑別資訊</h3>
+      <ul class="b sm"><li>初始密碼安全交付、首次登入強制變更</li><li>不貼便利貼、不用 Email 明文傳</li></ul>
+    </div>
+    <div class="card mini" data-in="up 5 1.2">
+      <h3><span class="tag t-red">8.5</span>安全鑑別</h3>
+      <ul class="b sm"><li>重要系統 <b>MFA</b></li><li>登入失敗鎖定、不提示錯誤線索</li></ul>
+    </div>
+    <div class="card mini" data-in="up 6 0">
+      <h3><span class="tag ">5.18</span>存取權限</h3>
+      <ul class="b sm"><li>資訊擁有者核准才開通</li><li>異動<b>先收回</b>再給；離職即停用</li><li>定期審查：一般半年、特權每季</li></ul>
+    </div>
+  </div>
+  <div class="postit" data-in="pop 4 0.3" data-out="5">我的密碼<br><b>aralei1234</b><span class="stampx" data-in="stamp 5 0.2">危險！</span></div>
+  <div class="creep" data-in="pop 8 1" data-out="9">
+    <div class="creep-h">權限蠕變 Privilege creep</div>
+    <div class="bars">
+      <div class="bar"><i style="height:30%"></i><span>第1年</span></div>
+      <div class="bar"><i style="height:62%"></i><span>第5年</span></div>
+      <div class="bar"><i class="hot" style="height:100%"></i><span>第10年</span></div>
+    </div>
+    <div class="creep-f">比總經理還大！</div>
+  </div>
+
+  <div class="case" data-in="zoom 9 0">
+    <div class="case-h"><svg class="ic" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 7h2M14 7h2M8 11h2M14 11h2M8 15h2M14 15h2"/></svg>實際案例｜離職三個月，VPN 還能登入</div>
+    <div class="tl">
+      <div class="tl-i" data-in="left 9 1.6"><b>D-Day</b>業務經理離職</div>
+      <div class="tl-a">➜</div>
+      <div class="tl-i warn" data-in="left 9 3.4"><b>+90 天</b>VPN 帳號仍可登入</div>
+      <div class="tl-a">➜</div>
+      <div class="tl-i bad" data-in="left 9 5"><b>事件</b>客戶名單被下載</div>
+    </div>
+    <div class="fixbox" data-in="up 11 0">
+      <div class="fix-h"><svg class="ic" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#15803d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg>改善做法（雙重保險）</div>
+      <div class="fix-row">
+        <div class="fix-i" data-in="pop 11 0.8"><svg class="ic" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#15803d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5M9 13h8M9 17h8"/></svg><div>人資離職單 ➜ 自動停用 AD 帳號<br><small>離職當天 17:00 自動執行</small></div></div>
+        <div class="fix-i" data-in="pop 11 5.4"><svg class="ic" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#15803d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><div>每月 HR 名單 × 帳號清單比對<br><small>VPN、雲端信箱、SaaS 全部納入</small></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="take" data-in="wipe 12 0.4">第二段口訣：<b>一人一號・密碼保密・MFA 加持・權限定期審</b></div></div></section>
+<section class="scene" data-i="4"><div class="content">
+  <div class="hubmap" data-in="fade 0 0" data-out="7">
+    <svg class="spokes" viewBox="0 0 850 430" aria-hidden="true">
+      <path d="M425 215 L250 95" pathLength="1" data-in="draw 1 0"/>
+      <path d="M425 215 L600 95" pathLength="1" data-in="draw 2 0"/>
+      <path d="M425 215 L250 335" pathLength="1" data-in="draw 5 0"/>
+      <path d="M425 215 L600 335" pathLength="1" data-in="draw 6 0"/>
+    </svg>
+    <div class="hub" data-in="zoom 0 0.6"><svg class="ic" viewBox="0 0 24 24" width="46" height="46" fill="none" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18h18l-2-10-5 4-2-6-2 6-5-4z"/><path d="M4 21h16"/></svg><b>特權</b><span class="hero" data-in="stamp 3 0.4">變身！</span></div>
+    <div class="spot s-tl" data-in="pop 1 0">
+      <h3><span class="tag ">7.2</span>實體進入｜安全區域</h3>
+      <ul class="b sm"><li>機房、檔案室：門禁＋進出紀錄</li><li>訪客登記、識別證、<b>全程陪同</b>、離開歸還</li></ul>
+    </div>
+    <div class="spot s-tr" data-in="pop 2 0">
+      <h3><span class="tag ">8.2</span>特殊存取權限</h3>
+      <ul class="b sm"><li>個別核准、<b>限制人數</b></li><li>日常用一般帳號，需要才切換管理員</li><li data-in="left 4 3">導入 <b>PAM</b>：借用、錄影、自動換密碼</li></ul>
+    </div>
+    <div class="spot s-bl" data-in="pop 5 0">
+      <h3><span class="tag ">8.3</span>資訊存取限制</h3>
+      <ul class="b sm"><li>應用系統依<b>角色</b>控制資料與功能</li><li>例：客服只看<b>遮罩</b>後身分證字號<br><code>A12****789</code></li></ul>
+    </div>
+    <div class="spot s-br" data-in="pop 6 0">
+      <h3><span class="tag ">8.4</span>對原始碼之存取</h3>
+      <ul class="b sm"><li>原始碼、開發工具、函式庫控管讀寫</li><li>不直接改正式環境；<b>版控＋審查</b>才上線</li></ul>
+    </div>
+  </div>
+
+  <div class="case" data-in="zoom 7 0">
+    <div class="case-h"><svg class="ic" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 7h2M14 7h2M8 11h2M14 11h2M8 15h2M14 15h2"/></svg>實際案例｜委外工程師帶走「萬能鑰匙」</div>
+    <div class="facts">
+      <div class="fact" data-in="left 7 2.2"><svg class="ic" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#b91c1c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><div>資料庫<b>最高權限</b>帳號</div></div>
+      <div class="fact" data-in="left 7 4"><svg class="ic" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#b91c1c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><div>密碼<b>半年沒換</b></div></div>
+      <div class="fact" data-in="left 7 5.6"><svg class="ic" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#b91c1c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="3" width="12" height="18" rx="1"/><circle cx="15" cy="12" r="1"/><path d="M3 21h18"/></svg><div>合約結束<b>沒人收回</b></div></div>
+    </div>
+    <div class="fixbox" data-in="up 9 0">
+      <div class="fix-h"><svg class="ic" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#15803d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg>改善：PAM 時段性授權</div>
+      <div class="flow">
+        <span data-in="pop 9 1.6"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#15803d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>具名帳號</span><em>➜</em>
+        <span data-in="pop 9 3.2"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#15803d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5M9 13h8M9 17h8"/></svg>申請＋核准</span><em>➜</em>
+        <span data-in="pop 9 4.6"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#15803d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>時段授權</span><em>➜</em>
+        <span data-in="pop 9 6"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#15803d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/></svg>全程錄影</span><em>➜</em>
+        <span data-in="pop 9 7.2"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#15803d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>自動收回</span>
+      </div>
+    </div>
+  </div>
+  <div class="take" data-in="wipe 10 0.4">第三段口訣：<b>門禁有紀錄・特權要節制・資料看角色・原始碼要版控</b></div></div></section>
+<section class="scene" data-i="5"><div class="content">
+  <h2 class="scene-h amber" data-in="left 1 0"><svg class="ic" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#b45309" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>稽核員三招：看文件・比清單・抽紀錄</h2>
+  <div class="audit3">
+    <div class="card au" data-in="up 2 0">
+      <div class="au-no">1</div>
+      <h3><svg class="ic" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#b45309" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5M9 13h8M9 17h8"/></svg>看文件</h3>
+      <ul class="b sm">
+        <li>存取控制政策、帳號管理程序</li>
+        <li data-in="left 2 3.2">涵蓋<b>雲端、遠端、委外</b>？</li>
+        <li data-in="left 2 5.8">核准＋定期審查？</li>
+      </ul>
+    </div>
+    <div class="card au" data-in="up 3 0">
+      <div class="au-no">2</div>
+      <h3><svg class="ic" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#b45309" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h1M3 12h1M3 18h1"/></svg>比清單</h3>
+      <div class="cmp">
+        <div class="cmp-l"><b>HR 離職名單</b><span>王○明</span><span>李○華</span><span class="g">陳○宏</span></div>
+        <div class="cmp-x">×</div>
+        <div class="cmp-l"><b>AD／VPN 帳號</b><span class="del">wang.m</span><span class="del">lee.h</span><span class="g">chen.h</span></div>
+      </div>
+      <div class="ghost" data-in="zoom 4 0.2"><svg class="ic" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V10a7 7 0 0 1 14 0v11l-2.3-2-2.3 2-2.4-2-2.3 2-2.4-2z"/><circle cx="9.5" cy="10" r="1"/><circle cx="14.5" cy="10" r="1"/></svg>幽靈帳號！</div>
+      <div class="ask" data-in="pop 5 0.6">特權帳號逐一問：<b>誰的？誰核准？為何需要？</b></div>
+    </div>
+    <div class="card au" data-in="up 6 0">
+      <div class="au-no">3</div>
+      <h3><svg class="ic" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#b45309" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/></svg>抽紀錄</h3>
+      <ul class="b sm">
+        <li>權限申請單：<b>資訊擁有者</b>核准？</li>
+        <li data-in="left 6 4.2">權限審查：有<b>實際刪改</b>？</li>
+      </ul>
+      <div class="seal" data-in="stamp 6 6.8">只蓋章？</div>
+    </div>
+  </div>
+  <div class="onsite" data-in="up 7 0">
+    <b>現場觀察</b>
+    <span data-in="pop 7 1.4"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#334155" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="3" width="12" height="18" rx="1"/><circle cx="15" cy="12" r="1"/><path d="M3 21h18"/></svg>機房進出紀錄 vs 授權名單</span>
+    <span data-in="pop 7 3.6"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#334155" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>密碼原則設定截圖</span>
+    <span data-in="pop 7 5"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#334155" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>MFA 真的啟用？</span>
+    <span data-in="pop 7 6.4"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#334155" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="9" r="2.5"/><path d="M6 8.5v7M18 11.5c0 4-6 3-11 5"/></svg>版控分支保護</span>
+  </div>
+  <div class="four" data-in="wipe 9 1">
+    查核四有：<b>有規定</b><em>➜</em><b>有執行</b><em>➜</em><b>有紀錄</b><em>➜</em><b>有改善</b>
+  </div></div></section>
+<section class="scene" data-i="6"><div class="content">
+  <h2 class="scene-h red" data-in="left 1 0"><svg class="ic" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#b91c1c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg>驗證稽核現場｜八大常見缺失</h2>
+  <div class="nc-grid" data-in="fade 1 0" data-out="13">
+    
+    <div class="nc" data-in="pop 2 0" data-hl="12">
+      <div class="nc-no">1</div>
+      <div class="nc-t">離職帳號未即時停用</div>
+      <div class="nc-c"><span class="tag t-red">5.18</span></div>
+      <div class="nc-d">VPN、雲端信箱、SaaS 被漏掉</div>
+      <div class="rank" data-in="stamp 12 1.4">No.1</div>
+    </div>
+    <div class="nc" data-in="pop 3 0" data-hl="12">
+      <div class="nc-no">2</div>
+      <div class="nc-t">權限審查流於形式</div>
+      <div class="nc-c"><span class="tag t-red">5.18</span></div>
+      <div class="nc-d">只寫「無異常」，無清單、無調整</div>
+      <div class="rank" data-in="stamp 12 3.4">No.2</div>
+    </div>
+    <div class="nc" data-in="pop 5 0">
+      <div class="nc-no">3</div>
+      <div class="nc-t">共用／預設帳號未管理</div>
+      <div class="nc-c"><span class="tag t-red">5.16</span></div>
+      <div class="nc-d">administrator 大家一起用</div>
+      
+    </div>
+    <div class="nc" data-in="pop 6 0">
+      <div class="nc-no">4</div>
+      <div class="nc-t">自己申請、自己核准</div>
+      <div class="nc-c"><span class="tag t-red">5.3</span></div>
+      <div class="nc-d">管理者球員兼裁判</div>
+      
+    </div>
+    <div class="nc" data-in="pop 7 0">
+      <div class="nc-no">5</div>
+      <div class="nc-t">密碼原則與設定不一致</div>
+      <div class="nc-c"><span class="tag t-red">5.17・5.37</span></div>
+      <div class="nc-d">程序寫 12 碼，GPO 只設 6 碼</div>
+      
+    </div>
+    <div class="nc" data-in="pop 8 0">
+      <div class="nc-no">6</div>
+      <div class="nc-t">特權與服務帳號失控</div>
+      <div class="nc-c"><span class="tag t-red">8.2・8.4</span></div>
+      <div class="nc-d">開發有正式環境管理權、密碼寫死在程式</div>
+      
+    </div>
+    <div class="nc" data-in="pop 9 0">
+      <div class="nc-no">7</div>
+      <div class="nc-t">機房訪客未陪同</div>
+      <div class="nc-c"><span class="tag t-red">7.2</span></div>
+      <div class="nc-d">紀錄不全、門禁卡未繳回</div>
+      
+    </div>
+    <div class="nc" data-in="pop 10 0">
+      <div class="nc-no">8</div>
+      <div class="nc-t">政策未涵蓋雲端與遠端</div>
+      <div class="nc-c"><span class="tag t-red">5.15</span></div>
+      <div class="nc-d">還停留在只有內網的年代</div>
+      
+    </div>
+  </div>
+  <div class="homework" data-in="pop 4 0.2" data-out="5">寒假作業：<br>「已完成」✔<br><small>（內容呢？）</small></div>
+
+  <div class="quiz" data-in="zoom 13 0">
+    <div class="quiz-h">快問快答</div>
+    <div class="quiz-q">主管每季做權限審查，<b>有簽名、有日期</b>，但<b>沒附帳號清單</b>……算缺失嗎？</div>
+    <div class="quiz-a" data-in="stamp 14 0.1">算！</div>
+    <div class="quiz-why" data-in="up 14 2">
+      <svg class="ic" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#15803d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg><div>正確做法：附上當時<b>系統匯出</b>的帳號權限清單，逐筆標註<b>保留／刪除／調整</b>，並追蹤到結案。</div>
+    </div>
+  </div></div></section>
+<section class="scene" data-i="7"><div class="content">
+  <h2 class="scene-h" data-in="left 0 0"><svg class="ic" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#0f766e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>今日重點總整理</h2>
+  <div class="sum3">
+    <div class="card sm1" data-in="up 1 0">
+      <h3><svg class="ic" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#0f766e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>ISMS 作業重點</h3>
+      <ul class="b sm"><li>政策先行・職務區隔・程序落地</li><li>一人一號・MFA・定期審查</li><li>特權節制・門禁管理・原始碼版控</li></ul>
+    </div>
+    <div class="card sm2" data-in="up 2 0">
+      <h3><svg class="ic" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#b45309" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>稽核查核重點</h3>
+      <ul class="b sm"><li>看文件・比清單・抽紀錄</li><li>有規定・有執行・有紀錄・有改善</li></ul>
+    </div>
+    <div class="card sm3" data-in="up 3 0">
+      <h3><svg class="ic" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#b91c1c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg>常見缺失四大地雷</h3>
+      <ul class="b sm"><li>離職帳號未停用</li><li>權限審查流於形式</li><li>共用帳號</li><li>自己核准自己</li></ul>
+    </div>
+  </div>
+  <div class="motto" data-in="zoom 5 2.4">
+    讓<b>對的人</b>，在<b>對的時間</b>，用<b>對的權限</b>，做<b>對的事</b>
+  </div>
+  <div class="bye" data-in="stamp 6 0.4">下堂課見！</div></div></section>
+        <!-- Q版講師 Allan Lo -->
+        <div class="char" id="allanWrap">
+          <svg viewBox="-50 0 280 300" aria-label="Q版 Allan Lo 講師">
+            <ellipse cx="110" cy="293" rx="70" ry="8" fill="rgba(0,0,0,.14)"/>
+            <rect x="84" y="236" width="19" height="48" rx="8" fill="#2b3245"/>
+            <rect x="117" y="236" width="19" height="48" rx="8" fill="#2b3245"/>
+            <ellipse cx="90" cy="286" rx="17" ry="7" fill="#111"/><ellipse cx="131" cy="286" rx="17" ry="7" fill="#111"/>
+            <g id="alArm2">
+              <path d="M154 190 Q176 214 166 246" stroke="#1f3a68" stroke-width="21" stroke-linecap="round" fill="none"/>
+              <circle cx="166" cy="250" r="10.5" fill="#ffd6b0" stroke="#1d2b3a" stroke-width="2"/>
+            </g>
+            <path d="M56 254 Q54 176 110 170 Q166 176 164 254 Z" fill="#1f3a68" stroke="#1d2b3a" stroke-width="3"/>
+            <path d="M93 174 L127 174 L110 214 Z" fill="#fff"/>
+            <path d="M93 174 L104 216 L84 196 Z" fill="#17305a"/><path d="M127 174 L116 216 L136 196 Z" fill="#17305a"/>
+            <path d="M106 180 L114 180 L118 213 L110 226 L102 213 Z" fill="#e63946" stroke="#1d2b3a" stroke-width="1.5"/>
+            <rect x="128" y="204" width="28" height="15" rx="3" fill="#fff"/><text x="142" y="215.5" font-size="9" font-weight="700" text-anchor="middle" fill="#1f3a68" font-family="Fredoka,sans-serif">ALLAN</text>
+            <g id="alArm">
+              <path d="M66 190 Q40 194 26 174" stroke="#1f3a68" stroke-width="21" stroke-linecap="round" fill="none"/>
+              <line x1="22" y1="170" x2="-38" y2="108" stroke="#8b5a2b" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="-38" cy="108" r="6" fill="#e63946"/>
+              <circle cx="23" cy="171" r="10.5" fill="#ffd6b0" stroke="#1d2b3a" stroke-width="2"/>
+            </g>
+            <g id="alHead">
+              <circle cx="38" cy="108" r="13" fill="#ffd0a6" stroke="#1d2b3a" stroke-width="2.5"/>
+              <circle cx="182" cy="108" r="13" fill="#ffd0a6" stroke="#1d2b3a" stroke-width="2.5"/>
+              <circle cx="110" cy="102" r="72" fill="#ffd9b8" stroke="#1d2b3a" stroke-width="3"/>
+              <path d="M38 106 C28 40 70 20 112 22 C160 22 194 50 182 106 C178 82 166 68 148 62 C128 76 96 74 74 60 C58 70 46 84 38 106 Z" fill="#26262e"/>
+              <path d="M74 60 C98 48 128 46 148 62" stroke="#4a4a56" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <path d="M66 84 Q83 75 100 83" stroke="#26262e" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+              <path d="M120 83 Q137 75 154 84" stroke="#26262e" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+              <g id="alEyes">
+                <ellipse cx="84" cy="108" rx="6.5" ry="8.5" fill="#1d1d24"/><circle cx="86" cy="105" r="2.2" fill="#fff"/>
+                <ellipse cx="136" cy="108" rx="6.5" ry="8.5" fill="#1d1d24"/><circle cx="138" cy="105" r="2.2" fill="#fff"/>
+              </g>
+              <rect x="61" y="91" width="46" height="33" rx="11" fill="rgba(255,255,255,.18)" stroke="#2b2b2b" stroke-width="4.5"/>
+              <rect x="113" y="91" width="46" height="33" rx="11" fill="rgba(255,255,255,.18)" stroke="#2b2b2b" stroke-width="4.5"/>
+              <path d="M107 104 Q110 99 113 104" stroke="#2b2b2b" stroke-width="4" fill="none"/>
+              <path d="M61 102 L40 98 M159 102 L180 98" stroke="#2b2b2b" stroke-width="4"/>
+              <path d="M108 120 Q113 127 108 130" stroke="#d9a07c" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <ellipse cx="68" cy="136" rx="10" ry="6" fill="#ff9aa2" opacity=".55"/><ellipse cx="152" cy="136" rx="10" ry="6" fill="#ff9aa2" opacity=".55"/>
+              <path id="alSmile" d="M95 143 Q110 156 125 143" stroke="#7a1f2b" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+              <g id="alMouth" class="mouthO">
+                <path d="M96 141 Q110 139 124 141 Q124 160 110 160 Q96 160 96 141 Z" fill="#6b1424"/>
+                <ellipse cx="110" cy="154" rx="8" ry="4" fill="#ff7b8a"/>
+              </g>
+              <g id="alHat" style="display:none">
+                <path d="M40 74 Q46 16 110 14 Q174 16 180 74 Z" fill="#8b5e3c" stroke="#1d2b3a" stroke-width="3"/>
+                <path d="M42 66 Q110 52 178 66 L178 76 Q110 62 42 76 Z" fill="#5c3b22"/>
+                <path d="M26 78 Q110 54 194 78 Q110 90 26 78 Z" fill="#6f4a2f" stroke="#1d2b3a" stroke-width="3"/>
+                <text x="110" y="50" font-size="17" font-weight="900" text-anchor="middle" fill="#ffd84d" font-family="Noto Sans TC,sans-serif">稽核員</text>
+              </g>
+            </g>
+          </svg>
+          <span class="nametag" style="background:#1f3a68">Allan 老師</span>
+        </div>
+        <!-- 助教 阿拉蕾（原創 Q 版造型） -->
+        <div class="char" id="araleWrap">
+          <svg viewBox="0 0 200 280" aria-label="助教阿拉蕾">
+            <ellipse cx="100" cy="272" rx="52" ry="7" fill="rgba(0,0,0,.14)"/>
+            <path d="M28 112 C18 40 62 18 100 18 C138 18 182 40 172 112 L174 156 Q152 166 140 146 L60 146 Q48 166 26 156 Z" fill="#5b3a99" stroke="#1d2b3a" stroke-width="3"/>
+            <rect x="80" y="226" width="15" height="36" rx="6" fill="#ffe0c4"/><rect x="105" y="226" width="15" height="36" rx="6" fill="#ffe0c4"/>
+            <ellipse cx="86" cy="264" rx="14" ry="7" fill="#e5484d" stroke="#1d2b3a" stroke-width="2"/><ellipse cx="114" cy="264" rx="14" ry="7" fill="#e5484d" stroke="#1d2b3a" stroke-width="2"/>
+            <path d="M54 234 Q58 170 100 166 Q142 170 146 234 Z" fill="#4cc3e8" stroke="#1d2b3a" stroke-width="3"/>
+            <path d="M82 168 L100 186 L118 168 Z" fill="#fff" stroke="#1d2b3a" stroke-width="2"/>
+            <circle cx="100" cy="206" r="9" fill="#ffd84d" stroke="#1d2b3a" stroke-width="2"/>
+            <g>
+              <path d="M60 184 Q42 200 50 214" stroke="#4cc3e8" stroke-width="16" stroke-linecap="round" fill="none"/>
+              <rect x="22" y="196" width="40" height="50" rx="5" fill="#b07a45" stroke="#1d2b3a" stroke-width="2.5"/>
+              <rect x="27" y="204" width="30" height="36" rx="2" fill="#fff"/>
+              <path d="M31 212h20M31 219h20M31 226h14" stroke="#94a3b8" stroke-width="2"/>
+              <circle cx="52" cy="214" r="8" fill="#ffe0c4" stroke="#1d2b3a" stroke-width="2"/>
+            </g>
+            <g id="arArm">
+              <path d="M140 184 Q160 170 168 148" stroke="#4cc3e8" stroke-width="16" stroke-linecap="round" fill="none"/>
+              <circle cx="169" cy="144" r="9" fill="#ffe0c4" stroke="#1d2b3a" stroke-width="2"/>
+            </g>
+            <g id="arHead">
+              <circle cx="100" cy="104" r="62" fill="#ffe2c8" stroke="#1d2b3a" stroke-width="3"/>
+              <path d="M40 98 C44 50 78 40 100 42 C124 40 158 50 160 98 C152 82 140 72 128 74 C120 88 80 88 72 74 C60 72 48 82 40 98 Z" fill="#5b3a99"/>
+              <path d="M42 66 C46 18 154 18 158 66 Q100 50 42 66 Z" fill="#ff4d6d" stroke="#1d2b3a" stroke-width="3"/>
+              <circle cx="100" cy="38" r="12" fill="#fff" stroke="#1d2b3a" stroke-width="2"/>
+              <text x="100" y="43.5" font-size="14" font-weight="900" text-anchor="middle" fill="#ff4d6d" font-family="Noto Sans TC,sans-serif">助</text>
+              <g id="arEyes">
+                <ellipse cx="77" cy="110" rx="8" ry="10.5" fill="#1d1d24"/><circle cx="80" cy="106" r="3" fill="#fff"/>
+                <ellipse cx="123" cy="110" rx="8" ry="10.5" fill="#1d1d24"/><circle cx="126" cy="106" r="3" fill="#fff"/>
+              </g>
+              <circle cx="77" cy="109" r="24" fill="rgba(255,255,255,.28)" stroke="#1b1b1b" stroke-width="5"/>
+              <circle cx="123" cy="109" r="24" fill="rgba(255,255,255,.28)" stroke="#1b1b1b" stroke-width="5"/>
+              <path d="M101 107 h-2" stroke="#1b1b1b" stroke-width="5"/>
+              <ellipse cx="60" cy="140" rx="10" ry="6" fill="#ff8fa3" opacity=".6"/><ellipse cx="140" cy="140" rx="10" ry="6" fill="#ff8fa3" opacity=".6"/>
+              <path id="arSmile" d="M89 142 Q100 153 111 142" stroke="#7a1f2b" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <g id="arMouth" class="mouthO">
+                <path d="M89 140 Q100 138 111 140 Q111 157 100 157 Q89 157 89 140 Z" fill="#6b1424"/>
+                <ellipse cx="100" cy="152" rx="6" ry="3" fill="#ff7b8a"/>
+              </g>
+            </g>
+          </svg>
+          <span class="nametag" style="background:#7c4dcc">阿拉蕾助教</span>
+        </div>
+        <div id="sub"><div id="subWho"></div><div id="subTxt"></div></div>
+        <div id="chap"></div>
+        <div id="cover"><button id="start" type="button">▶ 開始上課</button><p>約 <span id="dur"></span> 分鐘｜請開啟聲音</p></div>
+      </div>
+    </div>
+    <div class="controls">
+      <div class="bar-row">
+        <button id="play" type="button">▶ 播放</button>
+        <button id="prev" type="button" aria-label="上一章">⏮</button>
+        <button id="next" type="button" aria-label="下一章">⏭</button>
+        <div id="seek" role="slider" tabindex="0" aria-label="播放進度" aria-valuemin="0"><div id="seekFill"></div></div>
+        <span id="time">0:00 / 0:00</span>
+        <select id="rate" aria-label="播放速度"><option value="0.8">0.8×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option></select>
+        <button id="fs" type="button">全螢幕</button>
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
+  </div>
+</div>
+<audio id="aud" preload="auto" src="narration.mp3"></audio>
+<script>
+const TL = {"duration":706.8,"fps":25,"scenes":[{"start":0,"end":54.434,"lines":[{"spk":"A","text":"各位學員大家好！我是你們的資安老朋友，Allan Lo，大家叫我Allan老師就好。","start":0.9,"dur":5.933,"chunks":[{"t":0,"text":"各位學員大家好！"},{"t":2.01,"text":"我是你們的資安老朋友，Allan Lo，大家叫我Allan老師就好。"}],"env":"06969975586775697498447985300000000000000000000000000078668887675597347987873355669976420000000008777678975300000039949847976899877676456479548963000"},{"spk":"R","text":"嗯洽～大家好！我是今天的助教阿拉蕾！老師老師，今天要上什麼呀？","start":7.553,"dur":8.115,"chunks":[{"t":0,"text":"嗯洽～大家好！"},{"t":1.96,"text":"我是今天的助教阿拉蕾！"},{"t":4.98,"text":"老師老師，今天要上什麼呀？"}],"env":"07775659999369984489984338875200000000000000000000000389966678535788449978970478844899862799779999777764300000000000000000000002799754666787897435666888874000003588853898777999645896645576677656777664200"},{"spk":"A","text":"今天要聊的，是ISO 27001:2022控制屬性中，「運作能力」分類裡的身分與存取管理，英文叫Identity and Access Management。","start":16.387,"dur":8.738,"chunks":[{"t":0,"text":"今天要聊的，是ISO 27001:2022控制屬性中，"},{"t":2.99,"text":"「運作能力」分類裡的身分與存取管理，"},{"t":4.98,"text":"英文叫Identity and Access Management。"}],"env":"048859878787747986300000000244899888458994557676665567775200000099887779897677538976446754744654664499754000000000089849877667844977876575578635996356546754654876687653000000000998874887677445477536677446547765357764200"},{"spk":"R","text":"存取管理？是不是就是…誰可以進門、誰可以開電腦？","start":25.845,"dur":6.221,"chunks":[{"t":0,"text":"存取管理？"},{"t":1.8,"text":"是不是就是…誰可以進門、誰可以開電腦？"}],"env":"034997755587407986667765420000000000000000000000356689626855668635998745658886400004579860337987665226788777666654300045798603378865530348860579766666653200"},{"spk":"A","text":"答對一半！今天我們用三個面向來拆解：第一，ISMS作業重點；第二，稽核查核重點；第三，常見的缺失。","start":32.786,"dur":8.925,"chunks":[{"t":0,"text":"答對一半！"},{"t":1.72,"text":"今天我們用三個面向來拆解：第一，ISMS作業重點；第二，"},{"t":6.3,"text":"稽核查核重點；第三，常見的缺失。"}],"env":"08886388656649985430000000000000000000000000003587589878677876569776775586774389445897540000000278777764000000775775448897378745987540000000388987642000035984894488467478638976420000000785569875520000044765478774487566764000"},{"spk":"A","text":"我平常是輔導顧問，也是驗證稽核員，所以今天會把兩邊的眼光都告訴你，保證實戰！","start":42.131,"dur":6.197,"chunks":[{"t":0,"text":"我平常是輔導顧問，也是驗證稽核員，所以今天會把兩邊的眼光都告訴你，保證實戰！"}],"env":"07727764787559635849853786499865320000000077667779757854773685588775420000000247999458747862876977865586755765379664754995458676653200000297577544599754200"},{"spk":"R","text":"哇！那我要趕快拿筆記本出來了！","start":49.049,"dur":4.085,"chunks":[{"t":0,"text":"哇！"},{"t":1.2,"text":"那我要趕快拿筆記本出來了！"}],"env":"0699986532000000000000000000000005899996798658998327743229998667885056533567507633444787887656677653000"}]},{"start":54.434,"end":124.047,"lines":[{"spk":"A","text":"先來看全景地圖。整個存取管理，就像一條生產線，分成三段。","start":55.334,"dur":6.027,"chunks":[{"t":0,"text":"先來看全景地圖。"},{"t":2.36,"text":"整個存取管理，就像一條生產線，分成三段。"}],"env":"0346988854898645486476479535865520000000000000000000000000000025966944875577398658876420000000003985898637755874665457986532000000039746644875598653200"},{"spk":"A","text":"第一段，是基於業務營運之存取要求：包含5.15存取控制、5.3職務區隔，以及5.37書面紀錄之運作程序。","start":61.781,"dur":8.393,"chunks":[{"t":0,"text":"第一段，是基於業務營運之存取要求："},{"t":2.74,"text":"包含5.15存取控制、5.3職務區隔，"},{"t":5.81,"text":"以及5.37書面紀錄之運作程序。"}],"env":"078776389876432000000003574688887699767666785476477544699964489876320000000099748777748657876633764563687545887530000000068879746964477754484398875320000000774488676797556854565587874476763478756744664468863200"},{"spk":"A","text":"第二段，是使用者存取管理：5.16身分管理、5.17鑑別資訊、5.18存取權限，再搭配8.5安全鑑別。","start":70.593,"dur":8.524,"chunks":[{"t":0,"text":"第二段，是使用者存取管理："},{"t":2.17,"text":"5.16身分管理、5.17鑑別資訊、5.18存取權限，"},{"t":6.69,"text":"再搭配8.5安全鑑別。"}],"env":"0699846997653200000000348765788844994467547478765887542000000000788886779955865856876687754200000003796976755574785774475558875420000000078879676898347446546755599865320000000389499648829956776687436447842776652000"},{"spk":"R","text":"等等老師！我看到有的講義寫「5.17安全鑑別」耶？","start":79.837,"dur":5.953,"chunks":[{"t":0,"text":"等等老師！"},{"t":1.78,"text":"我看到有的講義寫「5.17安全鑑別」耶？"}],"env":"09988599877997335665788875200000000000000000000007996348987799987986685478644775665876640000057880798645654666786398774477553579764466666535898875300"},{"spk":"A","text":"好眼力！安全鑑別在2022版的正確編號是8.5，屬於技術控制。5.17管的是密碼這類鑑別資訊本身，8.5管的是登入機制，兩個是好兄弟，但要分清楚喔。","start":86.511,"dur":13.287,"chunks":[{"t":0,"text":"好眼力！"},{"t":1.58,"text":"安全鑑別在2022版的正確編號是8.5，屬於技術控制。"},{"t":6.86,"text":"5.17管的是密碼這類鑑別資訊本身，8.5管的是登入機制，"},{"t":11.19,"text":"兩個是好兄弟，但要分清楚喔。"}],"env":"038986875588754200000000000000000000000000698688559855788854895998776688888667448666468645838864479864573897377777754000000002477773576474487445886420000000000000000000000000078698677557659757558788877763577973478578346747637655699754000000798687775387575463776763486256887420000000048757566475457646987432000000388846745874378754000"},{"spk":"A","text":"第三段，是系統、應用與實體的存取管理：7.2實體進入、8.2特殊存取權限、8.3資訊存取限制，還有8.4對原始碼之存取。","start":100.218,"dur":10.341,"chunks":[{"t":0,"text":"第三段，是系統、應用與實體的存取管理："},{"t":3.27,"text":"7.2實體進入、8.2特殊存取權限、8.3資訊存取限制，"},{"t":8.1,"text":"還有8.4對原始碼之存取。"}],"env":"0585587579876432000000034765785378865300000000799998876558836778436744637866687653000000000448689679965646645775888752000000008986778738854588646754654676557987532000000039848744774475468643763655786457886320000000269992898487544648867765677764543754447764200"},{"spk":"R","text":"所以是：先定規則，再管人，最後管門跟系統！","start":111.279,"dur":4.814,"chunks":[{"t":0,"text":"所以是：先定規則，再管人，最後管門跟系統！"}],"env":"0355999977645666898630000467987578876269983348777664004998248755467666653000005999637997048755566664288755657643367542000"},{"spk":"A","text":"漂亮！一句話記住：先定規則、再管身分、最後守住每一道門。","start":116.813,"dur":5.934,"chunks":[{"t":0,"text":"漂亮！"},{"t":1.46,"text":"一句話記住：先定規則、再管身分、最後守住每一道門。"}],"env":"02698779976430000000000000000000000000008649749835854699764200000000349978748973499875400000398486548735997542000000003599699559863867764897666553200"}]},{"start":124.047,"end":224.871,"lines":[{"spk":"A","text":"我們進入第一段：業務營運的存取要求。核心精神只有一句話：「最小權限」加上「有需要才知道」。","start":124.947,"dur":8.302,"chunks":[{"t":0,"text":"我們進入第一段：業務營運的存取要求。"},{"t":3.79,"text":"核心精神只有一句話：「最小權限」加上「有需要才知道」。"}],"env":"0778855986864866853998753200000000299978876688659844575457998447976530000000000000000000000000000002795598488656986535799774468438997520000000000039976974486448659855898632077544997457546589864200000000000000"},{"spk":"A","text":"5.15存取控制，組織要訂出存取控制政策，依照業務與資安要求，決定誰能存取什麼資訊、用什麼方式存取。","start":133.669,"dur":8.169,"chunks":[{"t":0,"text":"5.15存取控制，組織要訂出存取控制政策，依照業務與資安要求，"},{"t":5.06,"text":"決定誰能存取什麼資訊、用什麼方式存取。"}],"env":"0895986688777645854635986448886420000000038845997387644785477546735855559754589964200000000995997788668854663569877884459986320000000379789756978643864486576744665478764200000007985577637854646754558653000"},{"spk":"R","text":"而且要涵蓋實體與邏輯兩個層面！邏輯就是系統帳號，實體就是門禁卡，對吧？","start":142.559,"dur":8.913,"chunks":[{"t":0,"text":"而且要涵蓋實體與邏輯兩個層面！"},{"t":4.17,"text":"邏輯就是系統帳號，實體就是門禁卡，對吧？"}],"env":"0999936599975899963387657998666563336766640047875588983556786787533268735466556787654300000000000000000000048999746577763369995657756667446644358976436999963000035668533776504799755588776665357875334775400000089875078765200"},{"spk":"A","text":"沒錯！5.3職務區隔，就是把有衝突的職務拆開，不能球員兼裁判。例如申請權限的人，不能自己核准自己。","start":152.191,"dur":9.796,"chunks":[{"t":0,"text":"沒錯！"},{"t":1.5,"text":"5.3職務區隔，就是把有衝突的職務拆開，不能球員兼裁判。"},{"t":6.77,"text":"例如申請權限的人，不能自己核准自己。"}],"env":"06887455998642000000000000000000000000004885986449845777645773498775300000004996678988844786355864576654694368765300000088885558776467438535885420000000000000000000000000003898678885698658544875587866988653200000039896478445754794764486346765300"},{"spk":"A","text":"5.37書面紀錄之運作程序，就是把帳號開通、異動、刪除這些作業寫成程序，而且要讓需要的人拿得到、看得懂、照著做。","start":162.407,"dur":9.114,"chunks":[{"t":0,"text":"5.37書面紀錄之運作程序，"},{"t":2.28,"text":"就是把帳號開通、異動、刪除這些作業寫成程序，"},{"t":5.86,"text":"而且要讓需要的人拿得到、看得懂、照著做。"}],"env":"078589745974675588986458687546887468546654468874200000000489667798487558448934887653000005984998653200000003498646668577468778556644644665447986420000000079756998886445897586776675576799874200000478683797653000000049966349974200"},{"spk":"R","text":"那小公司只有三個人怎麼辦？大家都是球員，也都是裁判啊！","start":172.241,"dur":6.837,"chunks":[{"t":0,"text":"那小公司只有三個人怎麼辦？"},{"t":3.65,"text":"大家都是球員，也都是裁判啊！"}],"env":"079998566985059776655678740457789865447987559985876663358654555408998654200000000000000000000059996579998259995657645476655887666530000478740798855577453466504798656665200"},{"spk":"A","text":"問得好！人力不足的時候，可以用補償控制：例如保留完整的操作日誌，由主管或老闆定期覆核，這也是稽核員可以接受的做法。","start":179.798,"dur":9.874,"chunks":[{"t":0,"text":"問得好！"},{"t":1.41,"text":"人力不足的時候，可以用補償控制：例如保留完整的操作日誌，"},{"t":5.88,"text":"由主管或老闆定期覆核，這也是稽核員可以接受的做法。"}],"env":"0997864797530000000000000000000000000008879835934756557448997530000000036996897365466458744588753000000003986883798698698547666438547458535688742000000005983586489865358799387467446337734687764200000047998556458736865977534686349647674388527974200"},{"spk":"A","text":"來看個實際案例。我輔導過一家製造業，會計同仁同時有ERP「新增供應商主檔」和「執行付款」兩個權限。","start":190.092,"dur":7.95,"chunks":[{"t":0,"text":"來看個實際案例。"},{"t":2.05,"text":"我輔導過一家製造業，"},{"t":3.49,"text":"會計同仁同時有ERP「新增供應商主檔」和「執行付款」兩個權限。"}],"env":"0698459767765744898765876532000000000000000000000000003784368798269963873574887568975300000000349857758788667755676996359995259865558668577777458635639986530000278558756743783468866665543654489653200"},{"spk":"R","text":"那…他不就可以自己開一家假廠商，然後付錢給自己？","start":198.762,"dur":5.421,"chunks":[{"t":0,"text":"那…他不就可以自己開一家假廠商，然後付錢給自己？"}],"env":"0799998640000239993068726998233898665224673556632359975644799954687543650245899866430000000059975349973237846577655358630346624646553200"},{"spk":"A","text":"賓果！雖然那位同仁很誠實，但制度不能靠人品。後來我們做了一張職務衝突矩陣，把衝突權限拆給兩個人，系統也設定成互斥角色。","start":204.903,"dur":11.206,"chunks":[{"t":0,"text":"賓果！"},{"t":1.43,"text":"雖然那位同仁很誠實，但制度不能靠人品。"},{"t":5.47,"text":"後來我們做了一張職務衝突矩陣，把衝突權限拆給兩個人，系統也設定成互斥角色。"}],"env":"08986479975300000000000000000000000000024798997786895477797475457655567775320000000897469649842876448868643786542000000000000000000000000000039878987767744888773787446776448636536535998653000000002984498577468645865596696864676877653000000034784787677568947744663564644764579853000"},{"spk":"A","text":"重點整理：政策先行、衝突拆分、程序落地。第一段的三把鑰匙，請收好！","start":216.529,"dur":7.042,"chunks":[{"t":0,"text":"重點整理：政策先行、衝突拆分、程序落地。"},{"t":4.77,"text":"第一段的三把鑰匙，請收好！"}],"env":"049758747766897653200000000269856855986547877532000000339854754795289755200000457644879837876420000000000000000000000000005888749875975598687888555477763200000036755896479843000"}]},{"start":224.871,"end":338.197,"lines":[{"spk":"A","text":"第二段是使用者存取管理。我最喜歡用「帳號生命週期」來說明：到職、異動、離職，英文叫Joiner、Mover、Leaver。","start":225.771,"dur":9.598,"chunks":[{"t":0,"text":"第二段是使用者存取管理。"},{"t":2.87,"text":"我最喜歡用「帳號生命週期」來說明：到職、異動、離職，"},{"t":6.44,"text":"英文叫Joiner、Mover、Leaver。"}],"env":"069995599875445866568876579973476447377768765300000000000000000000000000000784697567378779875348974885587874498655678854786777665320000008997256777640000007974998653200000478445677753000000898874983488777764200000067737976420000089749864200"},{"spk":"A","text":"5.16身分管理：每個人要有唯一識別的帳號，一人一號，責任才追得到。共用帳號原則上禁止，真的必要，要經過核准，並記錄誰在什麼時候用。","start":235.789,"dur":11.591,"chunks":[{"t":0,"text":"5.16身分管理：每個人要有唯一識別的帳號，一人一號，責任才追得到。"},{"t":6.15,"text":"共用帳號原則上禁止，真的必要，要經過核准，並記錄誰在什麼時候用。"}],"env":"07849766869955863865776587753200000000488596897688786587765585486845975448975320000000888865644499864200000039969854773867669874300000000000000000000000000027988874897448986477658568547864577763000000004987838669998640000000099458779449834997642000000007985598787657859954755566378688644200"},{"spk":"R","text":"所以admin帳號大家一起用，是不行的囉？","start":248.1,"dur":3.764,"chunks":[{"t":0,"text":"所以admin帳號大家一起用，是不行的囉？"}],"env":"03559999779899768766665279975359997079983589954644654532899765300045688306875656546667888864000"},{"spk":"A","text":"那可是稽核員最愛的獵物！接著是5.17鑑別資訊：初始密碼要安全交付、首次登入要強制變更，密碼不能貼在便利貼，也不能用Email明文傳送。","start":252.584,"dur":11.082,"chunks":[{"t":0,"text":"那可是稽核員最愛的獵物！"},{"t":2.62,"text":"接著是5.17鑑別資訊：初始密碼要安全交付、首次登入要強制變更，"},{"t":7.46,"text":"密碼不能貼在便利貼，也不能用Email明文傳送。"}],"env":"08974785585559637856986456998665788667754200000000000000000000000000049958865886758856745664785773475459875320000000034785576898688776888635645984259885300000000359974667876779954665463786449865400000000799888736777538578378667334887640000007835877687524899766656535764498543000"},{"spk":"R","text":"我的密碼是aralei1234，好記又可愛！","start":264.386,"dur":4.444,"chunks":[{"t":0,"text":"我的密碼是aralei1234，好記又可愛！"}],"env":"0799748789989886446667997530000999899998787655300005786899855499765556887400000388530557776999503364236987542000"},{"spk":"A","text":"拜託，這種密碼駭客三秒就破了！再搭配8.5安全鑑別：重要系統要用多因子認證MFA，登入失敗要鎖定，登入畫面也不要提示「帳號正確、密碼錯誤」這種線索。","start":269.55,"dur":12.152,"chunks":[{"t":0,"text":"拜託，這種密碼駭客三秒就破了！"},{"t":3.21,"text":"再搭配8.5安全鑑別：重要系統要用多因子認證MFA，登入失敗要鎖定，"},{"t":8.36,"text":"登入畫面也不要提示「帳號正確、密碼錯誤」這種線索。"}],"env":"0896358886400000004948778877886445843754977763672279867630000000000000000000000000027968982795698487768863664497447877642000000025888865773477658887537877764564875676776842898642000089878555869887437537875432000000079879538977888645863699634756586588468468744599753000000079887743787666485654476447964200"},{"spk":"A","text":"5.18存取權限：權限要經過資訊擁有者核准才開通；人員異動時，先收回舊權限，再給新權限；離職要及時停用。還要定期審查，一般使用者每半年，特權帳號建議每季。","start":282.122,"dur":13.743,"chunks":[{"t":0,"text":"5.18存取權限：權限要經過資訊擁有者核准才開通；人員異動時，"},{"t":5.69,"text":"先收回舊權限，再給新權限；離職要及時停用。"},{"t":9.54,"text":"還要定期審查，一般使用者每半年，特權帳號建議每季。"}],"env":"07849758579845864574476554998643000000000479755888647758943785487677788459844993785466378337865400000008889875787554778640000003498669729749447755589864200000000498584577447655898653000000008845689954655633666898542000000000000000000000000000038997687446587554798764200000008879865577855968848876677764200000038964874885469834877766534468753200"},{"spk":"R","text":"為什麼異動要先收回舊的呀？","start":296.585,"dur":2.58,"chunks":[{"t":0,"text":"為什麼異動要先收回舊的呀？"}],"env":"07999666877774564089865546897555687655588724765247774565666654200"},{"spk":"A","text":"因為不收回，就會出現權限累積。一個人在公司待十年，權限比總經理還大，這就叫「權限蠕變」。","start":299.886,"dur":8.502,"chunks":[{"t":0,"text":"因為不收回，就會出現權限累積。"},{"t":3.44,"text":"一個人在公司待十年，權限比總經理還大，這就叫「權限蠕變」。"}],"env":"089899466589724998764200000000397994478559964568557877534467753000000000000000000000000006848969976489377644679965766787764200000034986679779447654677546738987530000000389499449986344765486674599754200000000000000"},{"spk":"A","text":"實際案例來了！某公司業務經理離職三個月，結果發現他的VPN帳號還能登入，而且還下載了客戶名單。","start":308.807,"dur":8.102,"chunks":[{"t":0,"text":"實際案例來了！"},{"t":1.85,"text":"某公司業務經理離職三個月，結果發現他的VPN帳號還能登入，而且還下載了客戶名單。"}],"env":"02449656999878877668753000000000000000000000000000000885687556779877447767776577446558757558987420000000024893873985486476763762687548864489954666537665787642000000007975485675487458675357437666448765300"},{"spk":"R","text":"天啊！那怎麼補救？","start":317.63,"dur":2.873,"chunks":[{"t":0,"text":"天啊！"},{"t":1.53,"text":"那怎麼補救？"}],"env":"036987777652000000000000000000000000000006999950477566600443045999764200"},{"spk":"A","text":"我們把人資系統的離職單，跟AD帳號停用串成自動化流程，離職當天下午五點自動停用；另外每個月再拿人資名單跟各系統帳號清單比對一次，雙重保險。","start":321.222,"dur":10.333,"chunks":[{"t":0,"text":"我們把人資系統的離職單，跟AD帳號停用串成自動化流程，"},{"t":4.04,"text":"離職當天下午五點自動停用；"},{"t":5.99,"text":"另外每個月再拿人資名單跟各系統帳號清單比對一次，雙重保險。"}],"env":"0879778878645655746657664466389765300000049899675596478326567754388547644658636867755478765420000000079558697637865598866673786546476326658986432000000005988877747658995476787785447776479865375488547366448644785456686564386645558865200000036873756875569653000"},{"spk":"A","text":"第二段口訣：一人一號、密碼保密、MFA加持、權限定期審！","start":331.975,"dur":4.922,"chunks":[{"t":0,"text":"第二段口訣：一人一號、密碼保密、MFA加持、權限定期審！"}],"env":"0689839863685338877540000000088787656447998530000006988956976688764320000000798956748965547786320000438655865874476589654000"}]},{"start":338.197,"end":436.461,"lines":[{"spk":"A","text":"第三段，我們要守住每一道門：實體的門、系統的門、資料的門，還有原始碼的門。","start":339.097,"dur":6.302,"chunks":[{"t":0,"text":"第三段，我們要守住每一道門：實體的門、系統的門、資料的門，還有原始碼的門。"}],"env":"06757975699854320000000087999955985487787689866777654000000024587466776787754200000034686475666777653200000003598985767777642000000038997588566878666676553200"},{"spk":"A","text":"7.2實體進入：機房、檔案室這些安全區域，要有門禁管制和進出紀錄；訪客要登記、配戴識別證、全程陪同，離開時要歸還。","start":345.819,"dur":9.873,"chunks":[{"t":0,"text":"7.2實體進入：機房、檔案室這些安全區域，要有門禁管制和進出紀錄；"},{"t":5.72,"text":"訪客要登記、配戴識別證、全程陪同，離開時要歸還。"}],"env":"0447759767855645744776688864200000000037873399875530000087688657648558987447444777887642000000005999768765884786545895376476457348858886420000000028754799377754687653000000279698556478549986532000002487577578535886642000007837975479728962698654200"},{"spk":"A","text":"8.2特殊存取權限，也就是特權帳號，像網域管理員、資料庫管理員。要個別核准、限制人數，日常作業用一般帳號，需要時才切換管理員帳號。","start":356.112,"dur":12.124,"chunks":[{"t":0,"text":"8.2特殊存取權限，也就是特權帳號，像網域管理員、資料庫管理員。"},{"t":6.42,"text":"要個別核准、限制人數，日常作業用一般帳號，需要時才切換管理員帳號。"}],"env":"0887486787388547886438645644765569976422000000048579657469747549854499854000000002498787686596676479876540000000349799437568677558765430000000000000000000000000000089569478546974698654000000003897475786444987530000000006857874488676676738854885449986300000000245998556865595579388638767566547754489853000"},{"spk":"R","text":"就像超級英雄！平常是普通人，有任務才變身！","start":368.956,"dur":5.823,"chunks":[{"t":0,"text":"就像超級英雄！"},{"t":2.43,"text":"平常是普通人，有任務才變身！"}],"env":"04699966599766548998455566336777555687555540000000000000000000004988865996756669602465236877779766653000079765499864577844446650687654558976654300"},{"spk":"A","text":"這比喻太好了！特權帳號的使用還要留下紀錄，最好導入特權帳號管理系統PAM，做到借用、錄影、用完自動換密碼。","start":375.499,"dur":9.188,"chunks":[{"t":0,"text":"這比喻太好了！"},{"t":1.82,"text":"特權帳號的使用還要留下紀錄，最好導入特權帳號管理系統PAM，"},{"t":6.63,"text":"做到借用、錄影、用完自動換密碼。"}],"env":"04993776688389548967630000000000000000000000000023895596498559675546689975445887764795468678875400000000036986978875763697438645964772877645573565358788754000000368896469857986542000000069887776532000000598787644748636767876775200"},{"spk":"A","text":"8.3資訊存取限制：在應用系統裡面，依照角色控制能看哪些資料、能用哪些功能。例如客服只能看到遮罩後的身分證字號。","start":385.107,"dur":9.801,"chunks":[{"t":0,"text":"8.3資訊存取限制：在應用系統裡面，依照角色控制能看哪些資料、能用哪些功能。"},{"t":7.11,"text":"例如客服只能看到遮罩後的身分證字號。"}],"env":"088778744874675479643875475488645688753000000003898888765675777765688865320000000597998386597468755797675468675457347889987420000000677876654846777766540000000000000000000000000000079868834797348845667645758834995985388489655846756753564489743000"},{"spk":"A","text":"8.4對原始碼之存取：原始碼、開發工具、軟體函式庫，都要控管讀寫權限；開發人員不應該直接改正式環境，程式要經過版控和審查才上線。","start":395.327,"dur":10.793,"chunks":[{"t":0,"text":"8.4對原始碼之存取：原始碼、開發工具、軟體函式庫，"},{"t":4.38,"text":"都要控管讀寫權限；開發人員不應該直接改正式環境，"},{"t":8.43,"text":"程式要經過版控和審查才上線。"}],"env":"088768755466976875577776464476545687642000000068765778886520000003388388377754588753200000598637746755834698753000000003999843875786467467436655598754200000000389388687669874068766983564783784675573576544887532000000046875599844875945865438875488548544863654764449754200"},{"spk":"A","text":"案例分享：某電商委外廠商的工程師，拿到資料庫的最高權限帳號，密碼半年沒換，合約結束後也沒人收回。","start":406.541,"dur":7.976,"chunks":[{"t":0,"text":"案例分享：某電商委外廠商的工程師，拿到資料庫的最高權限帳號，"},{"t":4.98,"text":"密碼半年沒換，合約結束後也沒人收回。"}],"env":"08889639865998643000000000797798559987786894466545767267546645478763000000488697347899732767964795796466457459754489863000000006998884886667764498764300000000299799468557734999420677777644993288654200"},{"spk":"R","text":"哇！那外包廠商根本是拿著萬能鑰匙走掉了！","start":415.237,"dur":5.327,"chunks":[{"t":0,"text":"哇！"},{"t":1.2,"text":"那外包廠商根本是拿著萬能鑰匙走掉了！"}],"env":"06999865320000000000000000000000058999779994699982557433459976622988679644555776777634897499877666664899744545650366320589865566654000"},{"spk":"A","text":"後來的改善做法是：外包人員一律使用個人具名帳號，透過PAM申請時段性權限，全程錄影，用完自動收回。","start":421.284,"dur":7.856,"chunks":[{"t":0,"text":"後來的改善做法是：外包人員一律使用個人具名帳號，"},{"t":3.85,"text":"透過PAM申請時段性權限，全程錄影，用完自動收回。"}],"env":"02698896737854864796685555787632000000009959986875786575785546876479877545776549744599853000000003983973688876559864765564985475456655798653200000003975686778777654200000009987744547744973698654200"},{"spk":"A","text":"第三段口訣：門禁有紀錄、特權要節制、資料看角色、原始碼要版控。","start":429.56,"dur":5.601,"chunks":[{"t":0,"text":"第三段口訣：門禁有紀錄、特權要節制、資料看角色、原始碼要版控。"}],"env":"068559768745853379876520000000498757888644876988643000000032995678854774558986320000000369997388438755699753000000069866777789577434597543000"}]},{"start":436.461,"end":523.485,"lines":[{"spk":"R","text":"老師，換你戴上稽核員的帽子了！稽核員到底會查什麼？","start":437.361,"dur":6.255,"chunks":[{"t":0,"text":"老師，換你戴上稽核員的帽子了！"},{"t":3.92,"text":"稽核員到底會查什麼？"}],"env":"0799744566678775200000039998886508998558866555677326876477667768997623465567653000000000000000000000055788436899758986645999705665307995544775445655677654200"},{"spk":"A","text":"好，帽子戴上！稽核員查存取管理，我常用三招：看文件、比清單、抽紀錄。","start":444.336,"dur":7.151,"chunks":[{"t":0,"text":"好，帽子戴上！"},{"t":2.15,"text":"稽核員查存取管理，我常用三招：看文件、比清單、抽紀錄。"}],"env":"03799753000000799734797567975420000000000000000000000000035874987974698448644738866787653200000000785677764886469986400000237777645599854320000007645774898653000004399469679864200"},{"spk":"A","text":"第一招，看文件：存取控制政策、帳號管理程序是否存在？有沒有涵蓋雲端服務、遠端存取和委外人員？是否經過核准並定期審查？","start":451.907,"dur":11.79,"chunks":[{"t":0,"text":"第一招，看文件：存取控制政策、帳號管理程序是否存在？"},{"t":5.42,"text":"有沒有涵蓋雲端服務、遠端存取和委外人員？"},{"t":9.65,"text":"是否經過核准並定期審查？"}],"env":"0787647998650000000387676445997642000000003398558646866549865579975200000000389748956877556764565693784355538965420000000000000000000000000886899974575588766598425767887642000000005975996458655578754895877986665887654200000000000000000000000000034694597468649984479748986458648744657655468765300"},{"spk":"A","text":"第二招，比清單：我會跟人資要最近半年的離職名單，再跟AD、ERP、VPN的帳號清單交叉比對，看看有沒有幽靈帳號。","start":464.117,"dur":8.525,"chunks":[{"t":0,"text":"第二招，比清單：我會跟人資要最近半年的離職名單，"},{"t":3.65,"text":"再跟AD、ERP、VPN的帳號清單交叉比對，看看有沒有幽靈帳號。"}],"env":"0689855898763000000755476499865300000004749759888645699835964763787664856634466644987542000003596387873677520000589888432777530000000893798774886448964365863874683653389965300000003387578786678775986544874469853000"},{"spk":"R","text":"幽靈帳號！聽起來好可怕喔！","start":473.363,"dur":3.739,"chunks":[{"t":0,"text":"幽靈帳號！"},{"t":1.83,"text":"聽起來好可怕喔！"}],"env":"0799987976664798553369987520000000000000000000000388886668868887643498503475324699876677765200"},{"spk":"A","text":"還會拿特權帳號清單，一個一個問：這個帳號是誰的？誰核准的？為什麼需要？","start":477.821,"dur":7.384,"chunks":[{"t":0,"text":"還會拿特權帳號清單，一個一個問：這個帳號是誰的？"},{"t":4.62,"text":"誰核准的？"},{"t":6.41,"text":"為什麼需要？"}],"env":"03784687883488444987548854875566399764200000086686376499865320000000259884896378546558638863200000000000000000000000000358965994796568752000000000000000000000000002998668765547999864200"},{"spk":"A","text":"第三招，抽紀錄：抽樣權限申請單，看是不是由資訊擁有者核准；再抽權限審查紀錄，看審查有沒有實際刪改，而不是只蓋個章。","start":485.625,"dur":9.412,"chunks":[{"t":0,"text":"第三招，抽紀錄：抽樣權限申請單，看是不是由資訊擁有者核准；"},{"t":4.79,"text":"再抽權限審查紀錄，看審查有沒有實際刪改，而不是只蓋個章。"}],"env":"06757874799764000000439846967887640000000004489987448647758753654798754000000369758656558897347647866767857635883499754000000003895498468548646445854586688753000000002388558544699686688854544655875489753200000038954657745578466468765200"},{"spk":"A","text":"另外還會現場觀察：機房的進出紀錄跟授權名單是否一致？密碼原則的系統設定截圖、MFA有沒有真的啟用？版控系統的分支保護有沒有開？","start":495.457,"dur":11.384,"chunks":[{"t":0,"text":"另外還會現場觀察：機房的進出紀錄跟授權名單是否一致？"},{"t":4.86,"text":"密碼原則的系統設定截圖、MFA有沒有真的啟用？"},{"t":9.21,"text":"版控系統的分支保護有沒有開？"}],"env":"079878998657595587556568754589875200000000358568674686367458858885269658974676654885568378642568763200000000000000000000000008988776875586755673576557947644783358775300000000089998339966866788647785545699753200000000000000000000000002985479755755766638747569753079762068677875447865300"},{"spk":"R","text":"原來稽核員像偵探一樣，真相都藏在證據裡！","start":507.56,"dur":4.748,"chunks":[{"t":0,"text":"原來稽核員像偵探一樣，真相都藏在證據裡！"}],"env":"08998889998505578733689856886555689866527978547976544369997553000000059987668997635998444665544897426987445785466654200"},{"spk":"A","text":"哈哈，沒錯！稽核講的是證據。查核口訣是四有：有規定、有執行、有紀錄、有改善。","start":513.029,"dur":9.157,"chunks":[{"t":0,"text":"哈哈，沒錯！"},{"t":2.15,"text":"稽核講的是證據。"},{"t":4.34,"text":"查核口訣是四有：有規定、有執行、有紀錄、有改善。"}],"env":"0389544998640000004777457997430000000000000000000000000003588469848866556479754488753000000000000000000000000000438945964797469756655687997532000000009956995499764320000008835885558776442000000885449859876420000008948755589753200"}]},{"start":523.485,"end":650.535,"lines":[{"spk":"R","text":"最後是大家最怕的單元：常見缺失！老師快告訴我們，哪些坑不要踩！","start":524.385,"dur":7.958,"chunks":[{"t":0,"text":"最後是大家最怕的單元：常見缺失！"},{"t":4.58,"text":"老師快告訴我們，哪些坑不要踩！"}],"env":"0469995369998745578439996469998505799724598465598666687666653000005468565459865454877556656777650000000000000000000005899655657884238994499965469768866676654000047875566997036987604767998625368753200"},{"spk":"A","text":"好，我整理了驗證稽核現場最常開立的八大缺失，大家一起來看！","start":533.063,"dur":4.607,"chunks":[{"t":0,"text":"好，我整理了驗證稽核現場最常開立的八大缺失，大家一起來看！"}],"env":"02599753000000000494598888674886487446857855987447976424956754587757758768543865556764000000289648884556763368643000"},{"spk":"A","text":"第一個：離職人員帳號未即時停用。這是5.18最經典的缺失，常常是VPN、雲端信箱或SaaS系統被漏掉。","start":538.09,"dur":8.859,"chunks":[{"t":0,"text":"第一個：離職人員帳號未即時停用。"},{"t":3.6,"text":"這是5.18最經典的缺失，常常是VPN、雲端信箱或SaaS系統被漏掉。"}],"env":"078884798753000000000008975678977755986458996359634655534665898542000000000000000000000000000388669778387577399638646867766449755477652000000468747755748826898754000000886995587556997620974885457664885567356477786389864000"},{"spk":"A","text":"第二個：權限審查流於形式。審查表上只有一句「經檢視無異常」，但拿不出當時的帳號清單，也沒有任何調整紀錄。","start":547.369,"dur":9.125,"chunks":[{"t":0,"text":"第二個：權限審查流於形式。"},{"t":3.28,"text":"審查表上只有一句「經檢視無異常」，但拿不出當時的帳號清單，也沒有任何調整紀錄。"}],"env":"0699964997530000000003498659965865537997488776456655578753200000000000000000000000000045864783975579875458987644499845787487557756754479765420000000000069789467457498855777487438654663987653000000877888658844973585664467578753000"},{"spk":"R","text":"就像寒假作業只寫「已完成」，但裡面沒有內容！","start":557.215,"dur":4.918,"chunks":[{"t":0,"text":"就像寒假作業只寫「已完成」，但裡面沒有內容！"}],"env":"047998668997534766658998435899769984355666666876530000366648866655676655530000007998766755578987766666786557777646775554300"},{"spk":"A","text":"第三個：共用帳號或預設帳號沒有管理，例如大家共用administrator，出事了找不到是誰做的，這違反5.16。","start":562.853,"dur":7.511,"chunks":[{"t":0,"text":"第三個：共用帳號或預設帳號沒有管理，"},{"t":2.37,"text":"例如大家共用administrator，出事了找不到是誰做的，"},{"t":6.46,"text":"這違反5.16。"}],"env":"06657975798642000000003888975886459997308777558488544898568873677668765320000000089677897478448767664567543784588642000002488757897379746895555785478738752000000487897357666658666679864200"},{"spk":"A","text":"第四個：系統管理者自己申請、自己核准、自己審查，這就是5.3職務區隔的缺失。","start":570.784,"dur":6.538,"chunks":[{"t":0,"text":"第四個：系統管理者自己申請、自己核准、自己審查，這就是5.3職務區隔的缺失。"}],"env":"06875585798753000000000245858847977745998436555568755488654200000003674564499349986430000000376586585445888752000000049949955977848864496457776448639564477555775300"},{"spk":"A","text":"第五個：密碼原則與實際設定不一致。程序寫密碼要十二碼，系統GPO設定卻只有六碼，這同時是5.17與5.37的問題。","start":577.742,"dur":9.93,"chunks":[{"t":0,"text":"第五個：密碼原則與實際設定不一致。"},{"t":3.59,"text":"程序寫密碼要十二碼，系統GPO設定卻只有六碼，這同時是5.17與5.37的問題。"}],"env":"068864489864200000000059988768764499973655574486689485278663457875300000000000000000000000000448854865776898678767865598967886400000000034785874473697559986877545845699789868874200000000496888656976596775875764547873377567587547754668568633266653000"},{"spk":"A","text":"第六個：特權帳號未限制。開發人員都有正式環境的管理員權限，或是服務帳號的密碼寫死在程式碼裡，這是8.2和8.4的問題。","start":588.092,"dur":10.42,"chunks":[{"t":0,"text":"第六個：特權帳號未限制。"},{"t":3.04,"text":"開發人員都有正式環境的管理員權限，或是服務帳號的密碼寫死在程式碼裡，"},{"t":8.38,"text":"這是8.2和8.4的問題。"}],"env":"078699579875300000000239956864985469985855686455887420000000000000000000000000035956878775798753699746985585278645768358776677346655489864200000000009957932798559854876768877875447844477548646655767775876532000000005868479747657875467488757544457568523265553200"},{"spk":"A","text":"第七個：機房訪客沒有陪同、進出紀錄不完整，或是離職人員的門禁卡沒有繳回，違反7.2。","start":598.932,"dur":7.046,"chunks":[{"t":0,"text":"第七個：機房訪客沒有陪同、進出紀錄不完整，"},{"t":3.52,"text":"或是離職人員的門禁卡沒有繳回，違反7.2。"}],"env":"068565854997530000000003486896387534687688862686337876532000000488548647868527787655997642000000003985977864575886775767655785368867775798427887642000000499578544747745787553000"},{"spk":"A","text":"第八個：存取控制政策沒有涵蓋雲端服務和遠端存取，政策還停留在十年前只有內網的時代。","start":606.398,"dur":6.56,"chunks":[{"t":0,"text":"第八個：存取控制政策沒有涵蓋雲端服務和遠端存取，"},{"t":3.84,"text":"政策還停留在十年前只有內網的時代。"}],"env":"06948973888640000000002388648547874646885549997235897446656876657872276678864468676696337644478753000000004998569678337779579655677644798644588658876655445389754200"},{"spk":"R","text":"老師，那哪一個最常見呀？","start":613.678,"dur":2.846,"chunks":[{"t":0,"text":"老師，那哪一個最常見呀？"}],"env":"079974456667777620000037999788885355068985058986445655446886656676642000"},{"spk":"A","text":"依我的經驗，第一名是離職帳號，第二名是權限審查流於形式。這兩個，稽核員幾乎每次都會抽！","start":617.244,"dur":8.103,"chunks":[{"t":0,"text":"依我的經驗，第一名是離職帳號，第二名是權限審查流於形式。"},{"t":5.51,"text":"這兩個，稽核員幾乎每次都會抽！"}],"env":"08889664477778976320000000028988887665578764564797446998530000000058997777665586568657855754468976876644665557875300000000000000000000000000047998654798640000000002489589669864578357786454577388446985300"},{"spk":"R","text":"快問快答時間！老師，如果主管每季做權限審查，有簽名、有日期，但沒有附帳號清單，這樣算缺失嗎？","start":626.067,"dur":11.603,"chunks":[{"t":0,"text":"快問快答時間！"},{"t":2.31,"text":"老師，如果主管每季做權限審查，有簽名、有日期，但沒有附帳號清單，這樣算缺失嗎？"}],"env":"028999769976327997268765554553356987665300000000000000000000079975456668887630000059982699953598389987786505578743599834477656698765675224536877764000000797526579887887666643000498653678546655666653000000999777778986222788627996437975554776299987542000048999996655579865447885554776787642000"},{"spk":"A","text":"算！因為無法證明審查了什麼。正確做法是附上當時系統匯出的帳號權限清單，逐筆標註保留、刪除或調整，並且追蹤到結案。","start":638.39,"dur":10.845,"chunks":[{"t":0,"text":"算！"},{"t":1.37,"text":"因為無法證明審查了什麼。"},{"t":3.97,"text":"正確做法是附上當時系統匯出的帳號權限清單，逐筆標註保留、刪除或調整，"},{"t":9.54,"text":"並且追蹤到結案。"}],"env":"03449996432000000000000000000000000005998898773688348977766557744588655767640000000000000000000000000047974864996289886445736847748874655575763784366845975459854564564466489754200000049839739965738866787753000000249875485396368736986530000000078854854894676754677887542000"}]},{"start":650.535,"end":706.8,"lines":[{"spk":"A","text":"最後，我們來總結今天的身分與存取管理。","start":651.435,"dur":3.187,"chunks":[{"t":0,"text":"最後，我們來總結今天的身分與存取管理。"}],"env":"03897469986420000000000878899447654697448637775568635997525754775473687687643200"},{"spk":"A","text":"作業重點：政策先行、職務區隔、程序落地；一人一號、MFA、定期審查；特權節制、門禁管理、原始碼版控。","start":655.042,"dur":9.323,"chunks":[{"t":0,"text":"作業重點：政策先行、職務區隔、程序落地；一人一號、MFA、定期審查；"},{"t":6.34,"text":"特權節制、門禁管理、原始碼版控。"}],"env":"038999658754997640000000005986485499654777654200000035898745783698864000044764486887388764200000000798875654489974300000069897249975000006884555864458978630000000369748746963578874200000078658838866787653200000068755679487535697542000"},{"spk":"A","text":"稽核重點：看文件、比清單、抽紀錄，還有記得四有：有規定、有執行、有紀錄、有改善。","start":664.784,"dur":7.845,"chunks":[{"t":0,"text":"稽核重點：看文件、比清單、抽紀錄，還有記得四有：有規定、有執行、有紀錄、有改善。"}],"env":"03597795587469875400000000338777545799754320000047556766997553000003489648859886420000000036999558775648799864200000000897399739986432000000883587556876543000000697447957987530000007949655699643000"},{"spk":"A","text":"常見缺失：離職帳號、形式審查、共用帳號、自己核准自己，這四大地雷，大家回去先自我檢查！","start":673.049,"dur":7.817,"chunks":[{"t":0,"text":"常見缺失：離職帳號、形式審查、共用帳號、自己核准自己，這四大地雷，"},{"t":6,"text":"大家回去先自我檢查！"}],"env":"0437654864697557886500000008845748984479975300000033875595585553798763000000069898579744599853000000004965763884853484447865300000000379657698477588876420000000498499379647656854787747755478764000"},{"spk":"R","text":"我學會了！回去就把我的aralei1234改掉，還要加上MFA！","start":681.586,"dur":6.835,"chunks":[{"t":0,"text":"我學會了！"},{"t":1.77,"text":"回去就把我的aralei1234改掉，還要加上MFA！"}],"env":"079975555887308998677765430000000000000000000000699835578863699659998779746746998899998876504775899855499765547626643068998752000000388779986059996569877776660067666554200"},{"spk":"A","text":"很好！存取管理不是為了刁難使用者，而是讓對的人，在對的時間，用對的權限，做對的事。","start":689.141,"dur":7.761,"chunks":[{"t":0,"text":"很好！"},{"t":1.4,"text":"存取管理不是為了刁難使用者，而是讓對的人，在對的時間，用對的權限，做對的事。"}],"env":"027654599852000000000000000000000000002478757839966888632475677979738879855468875599864000000006976667974885847987654000000039838856557346987540000004985977546764569875420000000397695755588742000"},{"spk":"R","text":"嗯洽！謝謝大家，我們下次見！","start":697.622,"dur":4.11,"chunks":[{"t":0,"text":"嗯洽！"},{"t":1.37,"text":"謝謝大家，我們下次見！"}],"env":"0776556799999753000000000000000000000046799967589847998556999997400000589667665669996255586046798654200"},{"spk":"A","text":"我是Allan老師，我們下堂課再見，拜拜！","start":702.451,"dur":3.049,"chunks":[{"t":0,"text":"我是Allan老師，我們下堂課再見，拜拜！"}],"env":"07766699977777655558764000000076866897365477499644897542000000069826976652000"}]}]};
+const META = [{"chapter":"開場","stage":0,"facet":"","hat":false},{"chapter":"流程全景","stage":6,"facet":"流程全景","hat":false},{"chapter":"一、業務存取要求","stage":1,"facet":"ISMS 作業重點","hat":false},{"chapter":"二、使用者存取管理","stage":2,"facet":"ISMS 作業重點","hat":false},{"chapter":"三、系統應用實體","stage":3,"facet":"ISMS 作業重點","hat":false},{"chapter":"稽核查核重點","stage":4,"facet":"稽核查核重點","hat":true},{"chapter":"常見的缺失","stage":5,"facet":"常見的缺失","hat":false},{"chapter":"總結","stage":6,"facet":"總結","hat":false}];
+(function(){
+  const $ = s => document.querySelector(s);
+  const capture = /[?&]capture/.test(location.search);
+  if (capture) document.body.classList.add('capture');
+  const stage = $('#stage'), box = $('#box'), aud = $('#aud');
+  const sceneEls = [...document.querySelectorAll('.scene')];
+  const DUR = {stampS:.5,pop:.55,up:.6,left:.55,right:.55,fade:.5,zoom:.7,stamp:.45,wipe:.9,draw:1.3};
+  const EASE = {pop:'cubic-bezier(.34,1.56,.64,1)',zoom:'cubic-bezier(.34,1.4,.64,1)',stamp:'cubic-bezier(.2,.9,.3,1.2)',draw:'ease-in-out'};
+
+  // 依時間軸把 data-in / data-out / data-hl 轉成 CSS 動畫延遲
+  sceneEls.forEach((el, si) => {
+    const sc = TL.scenes[si];
+    const at = k => { const L = sc.lines[Math.min(k, sc.lines.length-1)]; return L.start - sc.start; };
+    el.querySelectorAll('[data-in]').forEach(n => {
+      const [type, k, d] = n.dataset.in.split(' ');
+      const list = [`${type} ${DUR[type]}s ${EASE[type]||'ease-out'} ${(at(+k)+(+d)).toFixed(3)}s both`];
+      if (n.dataset.out) list.push(`out .45s ease-in ${at(+n.dataset.out).toFixed(3)}s forwards`);
+      if (n.dataset.hl) n.dataset.hl.split(' ').forEach(h => list.push(`hl 1.1s ease ${(at(+h)+0.3).toFixed(3)}s 1 none`));
+      n.style.animation = list.join(', ');
+    });
+  });
+
+  // 章節進度
+  const chap = $('#chap');
+  TL.scenes.forEach(s => { const d = document.createElement('div'); d.style.flex = (s.end - s.start).toFixed(2); d.innerHTML = '<i></i>'; chap.appendChild(d); });
+  const chapFills = [...chap.querySelectorAll('i')];
+
+  const hdrChevs = [...document.querySelectorAll('.chevs div')];
+  const facet = $('#facet');
+  const al = { wrap: $('#allanWrap'), arm: $('#alArm'), head: $('#alHead'), eyes: $('#alEyes'), smile: $('#alSmile'), mouth: $('#alMouth'), hat: $('#alHat') };
+  const ar = { wrap: $('#araleWrap'), arm: $('#arArm'), head: $('#arHead'), eyes: $('#arEyes'), smile: $('#arSmile'), mouth: $('#arMouth') };
+  const subWho = $('#subWho'), subTxt = $('#subTxt');
+  let cur = -1, anims = [], lastSub = '';
+
+  function sceneAt(t){ let i = 0; while (i < TL.scenes.length - 1 && t >= TL.scenes[i+1].start) i++; return i; }
+  function setScene(i){
+    cur = i;
+    sceneEls.forEach((el, k) => el.classList.toggle('on', k === i));
+    anims = sceneEls[i].getAnimations({subtree:true});
+    anims.forEach(a => a.pause());
+    const m = META[i];
+    hdrChevs.forEach(c => { const s = +c.dataset.s; c.classList.toggle('on', m.stage === 6 || m.stage === 4 || m.stage === 5 || s === m.stage); c.classList.toggle('cur', s === m.stage); });
+    facet.textContent = m.facet || '';
+    facet.className = {'ISMS 作業重點':'k-isms','稽核查核重點':'k-audit','常見的缺失':'k-nc','總結':'k-sum'}[m.facet] || '';
+    al.hat.style.display = m.hat ? '' : 'none';
+    document.querySelectorAll('#chips button').forEach((b,k)=>b.classList.toggle('cur', k===i));
+  }
+  function mouth(c, k){
+    c.smile.style.display = k < 0.08 ? '' : 'none';
+    c.mouth.style.display = k < 0.08 ? 'none' : '';
+    c.mouth.style.transform = `scale(${0.85 + k*0.25}, ${Math.max(.08, k)})`;
+  }
+  function renderAt(t){
+    t = Math.max(0, Math.min(TL.duration - 0.001, t));
+    const i = sceneAt(t);
+    if (i !== cur) setScene(i);
+    const sc = TL.scenes[i], lt = (t - sc.start) * 1000;
+    for (const a of anims) a.currentTime = lt;
+    // 目前句子
+    let li = -1;
+    for (let k = 0; k < sc.lines.length; k++) if (t >= sc.lines[k].start) li = k;
+    const L = li >= 0 ? sc.lines[li] : null;
+    const speaking = L && t < L.start + L.dur ? L.spk : null;
+    let open = 0;
+    if (speaking) {
+      const f = (t - L.start) * TL.fps, a = Math.floor(f), b = a + 1, w = f - a;
+      const va = +(L.env[a] || 0), vb = +(L.env[b] || 0);
+      open = (va * (1 - w) + vb * w) / 9;
+    }
+    mouth(al, speaking === 'A' ? open : 0);
+    mouth(ar, speaking === 'R' ? open : 0);
+    // 字幕
+    let txt = '', who = '';
+    if (L && t < L.start + L.dur + 0.35) {
+      const lt2 = t - L.start; let ch = L.chunks[0];
+      for (const c of L.chunks) if (lt2 >= c.t) ch = c;
+      txt = ch ? ch.text : L.text; who = L.spk;
+    }
+    const key = who + txt;
+    if (key !== lastSub) { lastSub = key; subTxt.textContent = txt; subWho.textContent = who ? (who === 'A' ? 'Allan 老師' : '阿拉蕾') : ''; subWho.className = who === 'R' ? 'r' : ''; }
+    // 角色動作
+    const aS = speaking === 'A', rS = speaking === 'R';
+    const aBob = Math.sin(t * 1.9) * 3 - (aS ? Math.abs(Math.sin(t * 7.5)) * 4 * open : 0);
+    al.wrap.style.transform = `translateY(${aBob.toFixed(2)}px)`;
+    al.head.setAttribute('transform', `rotate(${(Math.sin(t*1.3)*2 + (aS? Math.sin(t*4.1)*2.5:0)).toFixed(2)} 110 170)`);
+    al.arm.setAttribute('transform', `rotate(${(aS ? Math.sin(t*2.3)*9 - 4 : Math.sin(t*1.1)*2).toFixed(2)} 66 190)`);
+    const aBlink = ((t + 0.7) % 3.9) < 0.13;
+    al.eyes.setAttribute('transform', aBlink ? 'translate(0 108) scale(1 .12) translate(0 -108)' : '');
+    const rHop = rS ? Math.abs(Math.sin(t * 6.2)) * 10 : 0;
+    ar.wrap.style.transform = `translateY(${(Math.sin(t*2.4+1)*3 - rHop).toFixed(2)}px) rotate(${(rS?Math.sin(t*3.1)*3:0).toFixed(2)}deg)`;
+    ar.arm.setAttribute('transform', `rotate(${(rS ? Math.sin(t*6)*22 : Math.sin(t*1.6)*6).toFixed(2)} 140 184)`);
+    ar.head.setAttribute('transform', `rotate(${(Math.sin(t*1.7+2)*3).toFixed(2)} 100 160)`);
+    const rBlink = ((t + 2.1) % 3.3) < 0.13;
+    ar.eyes.setAttribute('transform', rBlink ? 'translate(0 110) scale(1 .12) translate(0 -110)' : '');
+    // 背景與章節條
+    document.getElementById('bg').style.transform = `translate(${(-(t*6)%32).toFixed(1)}px, ${(-(t*3)%32).toFixed(1)}px)`;
+    TL.scenes.forEach((s, k) => { chapFills[k].style.width = (t >= s.end ? 100 : t <= s.start ? 0 : (t - s.start) / (s.end - s.start) * 100).toFixed(2) + '%'; });
+  }
+  window.TL = TL; window.renderAt = renderAt;
+
+  if (capture) { renderAt(0); window.__ready = document.fonts.ready.then(() => true); return; }
+
+  // ===== 互動播放器 =====
+  const fit = () => { stage.style.transform = `scale(${box.clientWidth / 1280})`; };
+  new ResizeObserver(fit).observe(box); fit();
+  const fmt = s => `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+  $('#dur').textContent = Math.round(TL.duration / 60);
+  const seek = $('#seek'), fill = $('#seekFill'), time = $('#time'), playBtn = $('#play');
+  seek.setAttribute('aria-valuemax', Math.round(TL.duration));
+  TL.scenes.forEach((s, k) => {
+    if (k) { const tk = document.createElement('div'); tk.className = 'tick'; tk.style.left = (s.start / TL.duration * 100) + '%'; seek.appendChild(tk); }
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = META[k].chapter;
+    b.onclick = () => go(s.start + 0.01); $('#chips').appendChild(b);
+  });
+  let clock = 0, playing = false;
+  const now = () => (aud.readyState >= 1 && !aud.error) ? aud.currentTime : clock;
+  function go(t){ t = Math.max(0, Math.min(TL.duration, t)); clock = t; try { aud.currentTime = t; } catch(e){} renderAt(t); }
+  function play(){ $('#cover').hidden = true; playing = true; playBtn.textContent = '❚❚ 暫停';
+    aud.playbackRate = +$('#rate').value; const p = aud.play(); if (p) p.catch(() => {}); }
+  function pause(){ playing = false; playBtn.textContent = '▶ 播放'; aud.pause(); }
+  $('#start').onclick = play;
+  playBtn.onclick = () => playing ? pause() : play();
+  $('#prev').onclick = () => { const t = now(); const i = sceneAt(t); go(TL.scenes[(t - TL.scenes[i].start < 2 && i > 0) ? i - 1 : i].start + 0.01); };
+  $('#next').onclick = () => { const i = sceneAt(now()); if (i < TL.scenes.length - 1) go(TL.scenes[i+1].start + 0.01); };
+  $('#rate').onchange = e => { aud.playbackRate = +e.target.value; };
+  $('#fs').onclick = () => { const el = $('.stage-box'); try { (document.fullscreenElement ? document.exitFullscreen() : el.requestFullscreen()).catch(()=>{}); } catch(e){} };
+  const seekTo = e => { const r = seek.getBoundingClientRect(); go((e.clientX - r.left) / r.width * TL.duration); };
+  seek.addEventListener('pointerdown', e => { seekTo(e); seek.setPointerCapture(e.pointerId); seek.onpointermove = seekTo; });
+  seek.addEventListener('pointerup', () => { seek.onpointermove = null; });
+  seek.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(now() + 5); if (e.key === 'ArrowLeft') go(now() - 5); });
+  document.addEventListener('keydown', e => { if (e.code === 'Space' && !/BUTTON|SELECT/.test(e.target.tagName)) { e.preventDefault(); playing ? pause() : play(); } });
+  aud.addEventListener('ended', pause);
+  let last = performance.now();
+  (function loop(ts){
+    const dt = (ts - last) / 1000; last = ts;
+    if (playing && (aud.readyState < 1 || aud.error)) { clock += dt * (+$('#rate').value); if (clock >= TL.duration) pause(); }
+    const t = now();
+    renderAt(t);
+    fill.style.width = (t / TL.duration * 100) + '%';
+    seek.setAttribute('aria-valuenow', Math.round(t));
+    time.textContent = `${fmt(t)} / ${fmt(TL.duration)}`;
+    requestAnimationFrame(loop);
+  })(last);
+  go(0);
+})();
+</script>

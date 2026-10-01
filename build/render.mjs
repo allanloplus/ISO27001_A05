@@ -57,7 +57,7 @@ await Promise.all([...Array(WORKERS).keys()].map(async w => {
   if (a >= b) return;
   const page = await openPage(browser);
   const ff = spawn('ffmpeg', ['-v', 'error', '-y', '-f', 'image2pipe', '-c:v', 'mjpeg', '-framerate', String(FPS), '-i', '-',
-    '-c:v', 'libx264', '-preset', 'medium', '-crf', '20', '-pix_fmt', 'yuv420p', '-r', String(FPS), join(tmp, `p${w}.mp4`)], { stdio: ['pipe', 'inherit', 'inherit'] });
+    '-c:v', 'libx264', '-preset', 'slow', '-crf', '25', '-tune', 'animation', '-pix_fmt', 'yuv420p', '-r', String(FPS), join(tmp, `p${w}.mp4`)], { stdio: ['pipe', 'inherit', 'inherit'] });
   for (let f = a; f < b; f++) {
     await page.evaluate(t => window.renderAt(t), from + f / FPS);
     const buf = await page.screenshot({ type: 'jpeg', quality: 92 });

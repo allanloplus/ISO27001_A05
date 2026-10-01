@@ -13,6 +13,13 @@ Q 版 **Allan Lo 講師**（台灣男聲）＋ **阿拉蕾助教** 對話式動�
 
 > 註：原講義圖中「5.17 安全鑑別」在 2022 版正確編號為 **8.5 安全鑑別**，影片中已更正並說明。
 
+## 如何開啟動畫
+
+- **線上直接看**：開啟 Claude 發佈的播放器連結（私人連結，需分享後他人才能開啟）。
+- **本機看**：下載整個 repo（GitHub 綠色 Code → Download ZIP）並解壓縮，雙擊根目錄的 `index.html`（會自動轉到 `dist/index.html`）。
+  `dist/index.html` 與 `dist/narration.mp3` 必須放在同一資料夾，否則沒有聲音。
+- GitHub 網頁本身不會執行 HTML，直接在 GitHub 上點 `index.html` 只會看到原始碼；可在 repo 設定開啟 GitHub Pages（Settings → Pages → Branch）後用網址觀看。
+
 ## 成品
 
 | 檔案 | 說明 |

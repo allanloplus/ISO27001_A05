@@ -247,16 +247,23 @@ b{font-weight:900}
 
 /* ===== 角色 ===== */
 .char{position:absolute;will-change:transform}
-#allanWrap{left:1000px;top:286px;width:270px;height:300px;z-index:3}
-#araleWrap{left:858px;top:372px;width:168px;height:232px;z-index:4}
-.char svg{width:100%;height:100%;overflow:visible}
-.mouthO{transform-box:fill-box;transform-origin:center}
+#allanWrap{left:1028px;top:118px;width:237px;height:470px;z-index:3;transform-origin:50% 100%}
+#araleWrap{left:874px;top:292px;width:152px;height:302px;z-index:4;transform-origin:50% 100%}
+.char img{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
+#alMouth{transform-origin:39.14% 20.58%}
+#arMouth{transform-origin:53.82% 24.59%}
+#alHat{position:absolute;left:50%;top:-30px;transform:translateX(-50%);display:flex;align-items:center;gap:4px;white-space:nowrap;padding:4px 12px;border-radius:999px;background:#fde68a;border:3px solid var(--ink);font:900 16px var(--f-body);color:#7c3e06;box-shadow:3px 3px 0 var(--ink)}
 .char .nametag{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);font:900 14px var(--f-body);color:#fff;padding:1px 10px;border-radius:999px;border:2px solid var(--ink);white-space:nowrap}
 
 /* ===== 字幕 ===== */
-#sub{position:absolute;left:28px;top:604px;width:1224px;height:94px;background:#fff;border:3px solid var(--ink);border-radius:18px;box-shadow:0 5px 0 var(--ink);display:flex;align-items:center;gap:16px;padding:0 22px;z-index:6}
+#sub{position:absolute;left:28px;top:604px;width:1224px;height:94px;background:#fff;border:3px solid var(--ink);border-radius:18px;box-shadow:0 5px 0 var(--ink);display:flex;align-items:center;gap:16px;padding:0 22px 0 138px;z-index:6}
+#ava{position:absolute;left:14px;top:-30px;width:112px;height:112px;border-radius:50%;overflow:hidden;border:4px solid var(--allan);background:#fff;box-shadow:0 4px 0 var(--ink)}
+#ava.r{border-color:#0e7490}
+#ava img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+#ava img.on{display:block}
+#ava.off{visibility:hidden}
 #subWho{flex:none;min-width:104px;text-align:center;padding:6px 12px;border-radius:12px;color:#fff;font:900 20px var(--f-body);background:var(--allan)}
-#subWho.r{background:var(--arale)}
+#subWho.r{background:#0e7490}
 #subWho:empty{visibility:hidden}
 #subTxt{font:700 28px/1.38 var(--f-body);color:var(--ink);min-width:0}
 #chap{position:absolute;left:0;top:713px;width:1280px;height:7px;display:flex;gap:3px;z-index:7}
@@ -298,106 +305,20 @@ b{font-weight:900}
           <div id="facet"></div>
         </header>
         <!--SCENES-->
-        <!-- Q版講師 Allan Lo -->
+        <!-- Q版講師 Allan Lo（角色設定圖） -->
         <div class="char" id="allanWrap">
-          <svg viewBox="-50 0 280 300" aria-label="Q版 Allan Lo 講師">
-            <ellipse cx="110" cy="293" rx="70" ry="8" fill="rgba(0,0,0,.14)"/>
-            <rect x="84" y="236" width="19" height="48" rx="8" fill="#2b3245"/>
-            <rect x="117" y="236" width="19" height="48" rx="8" fill="#2b3245"/>
-            <ellipse cx="90" cy="286" rx="17" ry="7" fill="#111"/><ellipse cx="131" cy="286" rx="17" ry="7" fill="#111"/>
-            <g id="alArm2">
-              <path d="M154 190 Q176 214 166 246" stroke="#1f3a68" stroke-width="21" stroke-linecap="round" fill="none"/>
-              <circle cx="166" cy="250" r="10.5" fill="#ffd6b0" stroke="#1d2b3a" stroke-width="2"/>
-            </g>
-            <path d="M56 254 Q54 176 110 170 Q166 176 164 254 Z" fill="#1f3a68" stroke="#1d2b3a" stroke-width="3"/>
-            <path d="M93 174 L127 174 L110 214 Z" fill="#fff"/>
-            <path d="M93 174 L104 216 L84 196 Z" fill="#17305a"/><path d="M127 174 L116 216 L136 196 Z" fill="#17305a"/>
-            <path d="M106 180 L114 180 L118 213 L110 226 L102 213 Z" fill="#e63946" stroke="#1d2b3a" stroke-width="1.5"/>
-            <rect x="128" y="204" width="28" height="15" rx="3" fill="#fff"/><text x="142" y="215.5" font-size="9" font-weight="700" text-anchor="middle" fill="#1f3a68" font-family="Fredoka,sans-serif">ALLAN</text>
-            <g id="alArm">
-              <path d="M66 190 Q40 194 26 174" stroke="#1f3a68" stroke-width="21" stroke-linecap="round" fill="none"/>
-              <line x1="22" y1="170" x2="-38" y2="108" stroke="#8b5a2b" stroke-width="5" stroke-linecap="round"/>
-              <circle cx="-38" cy="108" r="6" fill="#e63946"/>
-              <circle cx="23" cy="171" r="10.5" fill="#ffd6b0" stroke="#1d2b3a" stroke-width="2"/>
-            </g>
-            <g id="alHead">
-              <circle cx="38" cy="108" r="13" fill="#ffd0a6" stroke="#1d2b3a" stroke-width="2.5"/>
-              <circle cx="182" cy="108" r="13" fill="#ffd0a6" stroke="#1d2b3a" stroke-width="2.5"/>
-              <circle cx="110" cy="102" r="72" fill="#ffd9b8" stroke="#1d2b3a" stroke-width="3"/>
-              <path d="M38 106 C28 40 70 20 112 22 C160 22 194 50 182 106 C178 82 166 68 148 62 C128 76 96 74 74 60 C58 70 46 84 38 106 Z" fill="#26262e"/>
-              <path d="M74 60 C98 48 128 46 148 62" stroke="#4a4a56" stroke-width="4" fill="none" stroke-linecap="round"/>
-              <path d="M66 84 Q83 75 100 83" stroke="#26262e" stroke-width="5.5" fill="none" stroke-linecap="round"/>
-              <path d="M120 83 Q137 75 154 84" stroke="#26262e" stroke-width="5.5" fill="none" stroke-linecap="round"/>
-              <g id="alEyes">
-                <ellipse cx="84" cy="108" rx="6.5" ry="8.5" fill="#1d1d24"/><circle cx="86" cy="105" r="2.2" fill="#fff"/>
-                <ellipse cx="136" cy="108" rx="6.5" ry="8.5" fill="#1d1d24"/><circle cx="138" cy="105" r="2.2" fill="#fff"/>
-              </g>
-              <rect x="61" y="91" width="46" height="33" rx="11" fill="rgba(255,255,255,.18)" stroke="#2b2b2b" stroke-width="4.5"/>
-              <rect x="113" y="91" width="46" height="33" rx="11" fill="rgba(255,255,255,.18)" stroke="#2b2b2b" stroke-width="4.5"/>
-              <path d="M107 104 Q110 99 113 104" stroke="#2b2b2b" stroke-width="4" fill="none"/>
-              <path d="M61 102 L40 98 M159 102 L180 98" stroke="#2b2b2b" stroke-width="4"/>
-              <path d="M108 120 Q113 127 108 130" stroke="#d9a07c" stroke-width="3" fill="none" stroke-linecap="round"/>
-              <ellipse cx="68" cy="136" rx="10" ry="6" fill="#ff9aa2" opacity=".55"/><ellipse cx="152" cy="136" rx="10" ry="6" fill="#ff9aa2" opacity=".55"/>
-              <path id="alSmile" d="M95 143 Q110 156 125 143" stroke="#7a1f2b" stroke-width="4.5" fill="none" stroke-linecap="round"/>
-              <g id="alMouth" class="mouthO">
-                <path d="M96 141 Q110 139 124 141 Q124 160 110 160 Q96 160 96 141 Z" fill="#6b1424"/>
-                <ellipse cx="110" cy="154" rx="8" ry="4" fill="#ff7b8a"/>
-              </g>
-              <g id="alHat" style="display:none">
-                <path d="M40 74 Q46 16 110 14 Q174 16 180 74 Z" fill="#8b5e3c" stroke="#1d2b3a" stroke-width="3"/>
-                <path d="M42 66 Q110 52 178 66 L178 76 Q110 62 42 76 Z" fill="#5c3b22"/>
-                <path d="M26 78 Q110 54 194 78 Q110 90 26 78 Z" fill="#6f4a2f" stroke="#1d2b3a" stroke-width="3"/>
-                <text x="110" y="50" font-size="17" font-weight="900" text-anchor="middle" fill="#ffd84d" font-family="Noto Sans TC,sans-serif">稽核員</text>
-              </g>
-            </g>
-          </svg>
+          <img class="body" src="img/allan.png" alt="Q版 Allan Lo 講師">
+          <img class="mouth" id="alMouth" src="img/allan-mouth.png" alt="">
+          <div id="alHat"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#7c3e06" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>稽核員模式</div>
           <span class="nametag" style="background:#1f3a68">Allan 老師</span>
         </div>
-        <!-- 助教 阿拉蕾（原創 Q 版造型） -->
+        <!-- 助教 阿拉蕾 AI 小助手（角色設定圖） -->
         <div class="char" id="araleWrap">
-          <svg viewBox="0 0 200 280" aria-label="助教阿拉蕾">
-            <ellipse cx="100" cy="272" rx="52" ry="7" fill="rgba(0,0,0,.14)"/>
-            <path d="M28 112 C18 40 62 18 100 18 C138 18 182 40 172 112 L174 156 Q152 166 140 146 L60 146 Q48 166 26 156 Z" fill="#5b3a99" stroke="#1d2b3a" stroke-width="3"/>
-            <rect x="80" y="226" width="15" height="36" rx="6" fill="#ffe0c4"/><rect x="105" y="226" width="15" height="36" rx="6" fill="#ffe0c4"/>
-            <ellipse cx="86" cy="264" rx="14" ry="7" fill="#e5484d" stroke="#1d2b3a" stroke-width="2"/><ellipse cx="114" cy="264" rx="14" ry="7" fill="#e5484d" stroke="#1d2b3a" stroke-width="2"/>
-            <path d="M54 234 Q58 170 100 166 Q142 170 146 234 Z" fill="#4cc3e8" stroke="#1d2b3a" stroke-width="3"/>
-            <path d="M82 168 L100 186 L118 168 Z" fill="#fff" stroke="#1d2b3a" stroke-width="2"/>
-            <circle cx="100" cy="206" r="9" fill="#ffd84d" stroke="#1d2b3a" stroke-width="2"/>
-            <g>
-              <path d="M60 184 Q42 200 50 214" stroke="#4cc3e8" stroke-width="16" stroke-linecap="round" fill="none"/>
-              <rect x="22" y="196" width="40" height="50" rx="5" fill="#b07a45" stroke="#1d2b3a" stroke-width="2.5"/>
-              <rect x="27" y="204" width="30" height="36" rx="2" fill="#fff"/>
-              <path d="M31 212h20M31 219h20M31 226h14" stroke="#94a3b8" stroke-width="2"/>
-              <circle cx="52" cy="214" r="8" fill="#ffe0c4" stroke="#1d2b3a" stroke-width="2"/>
-            </g>
-            <g id="arArm">
-              <path d="M140 184 Q160 170 168 148" stroke="#4cc3e8" stroke-width="16" stroke-linecap="round" fill="none"/>
-              <circle cx="169" cy="144" r="9" fill="#ffe0c4" stroke="#1d2b3a" stroke-width="2"/>
-            </g>
-            <g id="arHead">
-              <circle cx="100" cy="104" r="62" fill="#ffe2c8" stroke="#1d2b3a" stroke-width="3"/>
-              <path d="M40 98 C44 50 78 40 100 42 C124 40 158 50 160 98 C152 82 140 72 128 74 C120 88 80 88 72 74 C60 72 48 82 40 98 Z" fill="#5b3a99"/>
-              <path d="M42 66 C46 18 154 18 158 66 Q100 50 42 66 Z" fill="#ff4d6d" stroke="#1d2b3a" stroke-width="3"/>
-              <circle cx="100" cy="38" r="12" fill="#fff" stroke="#1d2b3a" stroke-width="2"/>
-              <text x="100" y="43.5" font-size="14" font-weight="900" text-anchor="middle" fill="#ff4d6d" font-family="Noto Sans TC,sans-serif">助</text>
-              <g id="arEyes">
-                <ellipse cx="77" cy="110" rx="8" ry="10.5" fill="#1d1d24"/><circle cx="80" cy="106" r="3" fill="#fff"/>
-                <ellipse cx="123" cy="110" rx="8" ry="10.5" fill="#1d1d24"/><circle cx="126" cy="106" r="3" fill="#fff"/>
-              </g>
-              <circle cx="77" cy="109" r="24" fill="rgba(255,255,255,.28)" stroke="#1b1b1b" stroke-width="5"/>
-              <circle cx="123" cy="109" r="24" fill="rgba(255,255,255,.28)" stroke="#1b1b1b" stroke-width="5"/>
-              <path d="M101 107 h-2" stroke="#1b1b1b" stroke-width="5"/>
-              <ellipse cx="60" cy="140" rx="10" ry="6" fill="#ff8fa3" opacity=".6"/><ellipse cx="140" cy="140" rx="10" ry="6" fill="#ff8fa3" opacity=".6"/>
-              <path id="arSmile" d="M89 142 Q100 153 111 142" stroke="#7a1f2b" stroke-width="4" fill="none" stroke-linecap="round"/>
-              <g id="arMouth" class="mouthO">
-                <path d="M89 140 Q100 138 111 140 Q111 157 100 157 Q89 157 89 140 Z" fill="#6b1424"/>
-                <ellipse cx="100" cy="152" rx="6" ry="3" fill="#ff7b8a"/>
-              </g>
-            </g>
-          </svg>
-          <span class="nametag" style="background:#7c4dcc">阿拉蕾助教</span>
+          <img class="body" src="img/arale.png" alt="阿拉蕾 AI 小助手">
+          <img class="mouth" id="arMouth" src="img/arale-mouth.png" alt="">
+          <span class="nametag" style="background:#0e7490">阿拉蕾助教</span>
         </div>
-        <div id="sub"><div id="subWho"></div><div id="subTxt"></div></div>
+        <div id="sub"><div id="ava"><img data-k="A-smile" src="img/face-allan-smile.jpg" alt=""><img data-k="A-laugh" src="img/face-allan-laugh.jpg" alt=""><img data-k="A-think" src="img/face-allan-think.jpg" alt=""><img data-k="A-scratch" src="img/face-allan-scratch.jpg" alt=""><img data-k="A-surprise" src="img/face-allan-surprise.jpg" alt=""><img data-k="A-point" src="img/face-allan-point.jpg" alt=""><img data-k="A-wink" src="img/face-allan-wink.jpg" alt=""><img data-k="A-talk" src="img/face-allan-talk.jpg" alt=""><img data-k="R-laugh" src="img/face-arale-laugh.jpg" alt=""><img data-k="R-think" src="img/face-arale-think.jpg" alt=""><img data-k="R-surprise" src="img/face-arale-surprise.jpg" alt=""><img data-k="R-confused" src="img/face-arale-confused.jpg" alt=""><img data-k="R-explain" src="img/face-arale-explain.jpg" alt=""><img data-k="R-cry" src="img/face-arale-cry.jpg" alt=""><img data-k="R-wink" src="img/face-arale-wink.jpg" alt=""><img data-k="R-cheer" src="img/face-arale-cheer.jpg" alt=""></div><div id="subWho"></div><div id="subTxt"></div></div>
         <div id="chap"></div>
         <div id="cover"><button id="start" type="button">▶ 開始上課</button><p>約 <span id="dur"></span> 分鐘｜請開啟聲音</p></div>
       </div>
@@ -449,8 +370,10 @@ const META = /*META*/null;
 
   const hdrChevs = [...document.querySelectorAll('.chevs div')];
   const facet = $('#facet');
-  const al = { wrap: $('#allanWrap'), arm: $('#alArm'), head: $('#alHead'), eyes: $('#alEyes'), smile: $('#alSmile'), mouth: $('#alMouth'), hat: $('#alHat') };
-  const ar = { wrap: $('#araleWrap'), arm: $('#arArm'), head: $('#arHead'), eyes: $('#arEyes'), smile: $('#arSmile'), mouth: $('#arMouth') };
+  const al = { wrap: $('#allanWrap'), mouth: $('#alMouth'), hat: $('#alHat') };
+  const ar = { wrap: $('#araleWrap'), mouth: $('#arMouth') };
+  const ava = $('#ava'), faces = {}; ava.querySelectorAll('img').forEach(i => faces[i.dataset.k] = i);
+  let lastFace = null;
   const subWho = $('#subWho'), subTxt = $('#subTxt');
   let cur = -1, anims = [], lastSub = '';
 
@@ -468,9 +391,8 @@ const META = /*META*/null;
     document.querySelectorAll('#chips button').forEach((b,k)=>b.classList.toggle('cur', k===i));
   }
   function mouth(c, k){
-    c.smile.style.display = k < 0.08 ? '' : 'none';
-    c.mouth.style.display = k < 0.08 ? 'none' : '';
-    c.mouth.style.transform = `scale(${0.85 + k*0.25}, ${Math.max(.08, k)})`;
+    c.mouth.style.display = k < 0.1 ? 'none' : '';
+    c.mouth.style.transform = `scale(${(0.88 + k*0.12).toFixed(3)}, ${Math.min(1, 0.15 + k).toFixed(3)})`;
   }
   function renderAt(t){
     t = Math.max(0, Math.min(TL.duration - 0.001, t));
@@ -500,27 +422,24 @@ const META = /*META*/null;
     }
     const key = who + txt;
     if (key !== lastSub) { lastSub = key; subTxt.textContent = txt; subWho.textContent = who ? (who === 'A' ? 'Allan 老師' : '阿拉蕾') : ''; subWho.className = who === 'R' ? 'r' : ''; }
+    // 字幕頭像（表情包）：依每句指定表情，換句時彈出
+    let fk = null;
+    if (who) { const e = (META[i].emo && META[i].emo[li]) || (who === 'A' ? 'smile' : 'laugh'); fk = who + '-' + e; }
+    if (fk !== lastFace) { if (lastFace) faces[lastFace].classList.remove('on'); if (fk) faces[fk].classList.add('on'); lastFace = fk; ava.className = !fk ? 'off' : who === 'R' ? 'r' : ''; }
+    if (L) { const p = Math.min(1, (t - L.start) / 0.28); ava.style.transform = `scale(${(0.7 + 0.3 * (1 - Math.pow(1 - p, 3)) + Math.sin(p * Math.PI) * 0.08).toFixed(3)})`; }
     // 角色動作
     const aS = speaking === 'A', rS = speaking === 'R';
     const aBob = Math.sin(t * 1.9) * 3 - (aS ? Math.abs(Math.sin(t * 7.5)) * 4 * open : 0);
-    al.wrap.style.transform = `translateY(${aBob.toFixed(2)}px)`;
-    al.head.setAttribute('transform', `rotate(${(Math.sin(t*1.3)*2 + (aS? Math.sin(t*4.1)*2.5:0)).toFixed(2)} 110 170)`);
-    al.arm.setAttribute('transform', `rotate(${(aS ? Math.sin(t*2.3)*9 - 4 : Math.sin(t*1.1)*2).toFixed(2)} 66 190)`);
-    const aBlink = ((t + 0.7) % 3.9) < 0.13;
-    al.eyes.setAttribute('transform', aBlink ? 'translate(0 108) scale(1 .12) translate(0 -108)' : '');
+    al.wrap.style.transform = `translateY(${aBob.toFixed(2)}px) rotate(${(aS ? Math.sin(t*2.2)*1.6 : Math.sin(t*0.9)*0.6).toFixed(2)}deg) scaleY(${(1 + Math.sin(t*2.1)*0.006).toFixed(4)})`;
     const rHop = rS ? Math.abs(Math.sin(t * 6.2)) * 10 : 0;
-    ar.wrap.style.transform = `translateY(${(Math.sin(t*2.4+1)*3 - rHop).toFixed(2)}px) rotate(${(rS?Math.sin(t*3.1)*3:0).toFixed(2)}deg)`;
-    ar.arm.setAttribute('transform', `rotate(${(rS ? Math.sin(t*6)*22 : Math.sin(t*1.6)*6).toFixed(2)} 140 184)`);
-    ar.head.setAttribute('transform', `rotate(${(Math.sin(t*1.7+2)*3).toFixed(2)} 100 160)`);
-    const rBlink = ((t + 2.1) % 3.3) < 0.13;
-    ar.eyes.setAttribute('transform', rBlink ? 'translate(0 110) scale(1 .12) translate(0 -110)' : '');
+    ar.wrap.style.transform = `translateY(${(Math.sin(t*2.4+1)*3 - rHop).toFixed(2)}px) rotate(${(rS?Math.sin(t*3.1)*3:Math.sin(t*1.2)*0.8).toFixed(2)}deg)`;
     // 背景與章節條
     document.getElementById('bg').style.transform = `translate(${(-(t*6)%32).toFixed(1)}px, ${(-(t*3)%32).toFixed(1)}px)`;
     TL.scenes.forEach((s, k) => { chapFills[k].style.width = (t >= s.end ? 100 : t <= s.start ? 0 : (t - s.start) / (s.end - s.start) * 100).toFixed(2) + '%'; });
   }
   window.TL = TL; window.renderAt = renderAt;
 
-  if (capture) { renderAt(0); window.__ready = document.fonts.ready.then(() => true); return; }
+  if (capture) { renderAt(0); window.__ready = Promise.all([document.fonts.ready, ...[...document.images].map(im => im.decode().catch(() => {}))]).then(() => true); return; }
 
   // ===== 互動播放器 =====
   const fit = () => { stage.style.transform = `scale(${box.clientWidth / 1280})`; };

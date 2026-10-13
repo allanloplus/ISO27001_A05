@@ -18,8 +18,9 @@ writeFileSync(join(OUT, 'lines.json'), JSON.stringify(lines, null, 1));
 if (!process.argv.includes('--no-tts') || !existsSync(join(OUT, 'timeline.json'))) {
   execFileSync('python3', [join(ROOT, 'build', 'tts.py')], { stdio: 'inherit' });
 }
+execFileSync('python3', [join(ROOT, 'build', 'sprites.py')], { stdio: 'inherit' });
 const TL = JSON.parse(readFileSync(join(OUT, 'timeline.json'), 'utf8'));
-const META = scenes.map(({ chapter, stage, facet, hat }) => ({ chapter, stage, facet, hat: !!hat }));
+const META = scenes.map(({ chapter, stage, facet, hat, emo }) => ({ chapter, stage, facet, hat: !!hat, emo: emo || [] }));
 
 const sceneHtml = scenes.map((s, i) => `<section class="scene" data-i="${i}"><div class="content">${s.html}</div></section>`).join('\n');
 const page = readFileSync(join(ROOT, 'src', 'template.html'), 'utf8')

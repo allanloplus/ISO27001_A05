@@ -1,6 +1,6 @@
 # ISO 27001:2022 身分與存取管理｜動畫教學影片
 
-Q 版 **Allan Lo 講師**（台灣男聲）＋ **阿拉蕾助教** 對話式動畫簡報，依「運作能力：Identity & Access Management」流程，從三個面向講解：
+Q 版 **Allan Lo 講師**（台灣男聲）＋ **阿拉蕾 AI 小助手**（助教）對話式動畫簡報；角色造型取自 `assets/characters/` 的角色設定圖（全身立繪＋對嘴、字幕頭像依每句切換表情包），依「運作能力：Identity & Access Management」流程，從三個面向講解：
 
 1. **ISMS 作業重點**：三段式流程
    - 基於業務營運之存取要求：5.15 存取控制、5.3 職務區隔、5.37 書面紀錄之運作程序
@@ -32,7 +32,7 @@ Q 版 **Allan Lo 講師**（台灣男聲）＋ **阿拉蕾助教** 對話式動�
 ## 修改與重建
 
 - 講稿與畫面：`src/scenes.mjs`（每句 `[講者, 字幕, 選用發音]`，`A(...)` 設定元素在第幾句出現）
-- 樣式與角色：`src/template.html`
+- 樣式與版面：`src/template.html`
 - 語音參數：`build/tts.py`（Allan＝`zh-TW-YunJheNeural`、阿拉蕾＝`zh-TW-HsiaoYuNeural` 調高音調）
 
 ```bash
@@ -43,4 +43,6 @@ node build/render.mjs             # 逐格錄製 MP4（需 Playwright Chromium +
 node build/render.mjs --stills 30,120   # 輸出指定秒數截圖檢查版面
 ```
 
-語音由 Microsoft Edge 線上 Neural TTS 產生；阿拉蕾為原創 Q 版致敬造型，若影片要公開或商業發行，請留意角色名稱與造型的著作權／商標授權。
+語音由 Microsoft Edge 線上 Neural TTS 產生。
+
+角色素材：`build/sprites.py` 從 `assets/characters/allan-sheet.jpg`、`arale-sheet.jpg` 切出全身去背圖、對嘴用嘴巴圖層與 8 種表情頭像（輸出到 `dist/img/`）；更換設定圖後重跑 `node build/build.mjs --no-tts` 即可。每句頭像表情在 `src/scenes.mjs` 各場景的 `emo` 陣列設定。

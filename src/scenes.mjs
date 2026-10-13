@@ -10,6 +10,7 @@
 //    html    : 畫面內容（850x496 內容區）
 //    lines   : [講者, 字幕文字, (選用)發音文字]
 //
+//    emo     : 每句的字幕頭像表情（取自角色設定圖表情包）
 //  動畫屬性 A(type, 第幾句出現, 額外延遲秒, 第幾句淡出, [強調句]) 由播放器依語音時間軸換算
 // =============================================================
 import { ic } from './icons.mjs';
@@ -23,6 +24,8 @@ const tag = (no, cls = '') => `<span class="tag ${cls}">${no}</span>`;
 
 // ---------- S0 開場 ----------
 const s0 = {
+  // 每句字幕頭像表情（Allan：smile laugh think scratch surprise point wink talk｜阿拉蕾：laugh think surprise confused explain cry wink cheer）
+  emo: ['laugh', 'cheer', 'point', 'confused', 'wink', 'smile', 'laugh'],
   chapter: '開場', stage: 0, facet: '',
   html: `
   <div class="title-wrap">
@@ -36,7 +39,7 @@ const s0 = {
     </div>
     <div class="intro-row">
       <div class="badge-name nv"${A('left', 0, 1.2)}><small>講師</small>Allan Lo<em>ISMS／PIMS 輔導顧問・驗證公司稽核員</em></div>
-      <div class="badge-name pp"${A('left', 1)}><small>助教</small>阿拉蕾<em>好奇心滿點的機器人助教</em></div>
+      <div class="badge-name pp"${A('left', 1)}><small>助教</small>阿拉蕾<em>AI 小助手</em></div>
     </div>
     <div class="sticker"${A('stamp', 5, 0.5)}>輔導 × 稽核<br>雙視角實戰</div>
   </div>`,
@@ -53,6 +56,8 @@ const s0 = {
 
 // ---------- S1 全景地圖 ----------
 const s1 = {
+  // 每句字幕頭像表情（Allan：smile laugh think scratch surprise point wink talk｜阿拉蕾：laugh think surprise confused explain cry wink cheer）
+  emo: ['smile', 'point', 'point', 'surprise', 'wink', 'talk', 'cheer', 'laugh'],
   chapter: '流程全景', stage: 6, facet: '流程全景',
   html: `
   <h2 class="scene-h"${A('left', 0)}>${ic('list', '#0f766e', 34)}存取管理三段式流程</h2>
@@ -100,6 +105,8 @@ const s1 = {
 
 // ---------- S2 第一段：業務營運之存取要求 ----------
 const s2 = {
+  // 每句字幕頭像表情（Allan：smile laugh think scratch surprise point wink talk｜阿拉蕾：laugh think surprise confused explain cry wink cheer）
+  emo: ['point', 'smile', 'explain', 'point', 'talk', 'confused', 'wink', 'talk', 'surprise', 'laugh', 'point'],
   chapter: '一、業務存取要求', stage: 1, facet: 'ISMS 作業重點',
   html: `
   <div class="principle"${A('zoom', 0, 0.4, 7)}>
@@ -176,6 +183,8 @@ const s2 = {
 
 // ---------- S3 第二段：使用者存取管理 ----------
 const s3 = {
+  // 每句字幕頭像表情（Allan：smile laugh think scratch surprise point wink talk｜阿拉蕾：laugh think surprise confused explain cry wink cheer）
+  emo: ['smile', 'point', 'think', 'laugh', 'wink', 'scratch', 'talk', 'confused', 'think', 'surprise', 'cry', 'point', 'laugh'],
   chapter: '二、使用者存取管理', stage: 2, facet: 'ISMS 作業重點',
   html: `
   <div class="jml"${A('fade', 0, 0, 9)}>
@@ -254,6 +263,8 @@ const s3 = {
 
 // ---------- S4 第三段：系統、應用、實體存取管理 ----------
 const s4 = {
+  // 每句字幕頭像表情（Allan：smile laugh think scratch surprise point wink talk｜阿拉蕾：laugh think surprise confused explain cry wink cheer）
+  emo: ['point', 'talk', 'point', 'cheer', 'laugh', 'talk', 'point', 'scratch', 'surprise', 'wink', 'laugh'],
   chapter: '三、系統應用實體', stage: 3, facet: 'ISMS 作業重點',
   html: `
   <div class="hubmap"${A('fade', 0, 0, 7)}>
@@ -318,6 +329,8 @@ const s4 = {
 
 // ---------- S5 稽核查核重點 ----------
 const s5 = {
+  // 每句字幕頭像表情（Allan：smile laugh think scratch surprise point wink talk｜阿拉蕾：laugh think surprise confused explain cry wink cheer）
+  emo: ['explain', 'wink', 'think', 'think', 'surprise', 'point', 'think', 'talk', 'think', 'laugh'],
   chapter: '稽核查核重點', stage: 4, facet: '稽核查核重點', hat: true,
   html: `
   <h2 class="scene-h amber"${A('left', 1)}>${ic('search', '#b45309', 34)}稽核員三招：看文件・比清單・抽紀錄</h2>
@@ -388,6 +401,8 @@ const F = [
   ['政策未涵蓋雲端與遠端', '5.15', '還停留在只有內網的年代', 10],
 ];
 const s6 = {
+  // 每句字幕頭像表情（Allan：smile laugh think scratch surprise point wink talk｜阿拉蕾：laugh think surprise confused explain cry wink cheer）
+  emo: ['cry', 'point', 'scratch', 'think', 'laugh', 'surprise', 'point', 'talk', 'scratch', 'think', 'talk', 'confused', 'point', 'explain', 'point'],
   chapter: '常見的缺失', stage: 5, facet: '常見的缺失',
   html: `
   <h2 class="scene-h red"${A('left', 1)}>${ic('alert', '#b91c1c', 34)}驗證稽核現場｜八大常見缺失</h2>
@@ -432,6 +447,8 @@ const s6 = {
 
 // ---------- S7 總結 ----------
 const s7 = {
+  // 每句字幕頭像表情（Allan：smile laugh think scratch surprise point wink talk｜阿拉蕾：laugh think surprise confused explain cry wink cheer）
+  emo: ['smile', 'point', 'wink', 'point', 'cheer', 'smile', 'wink', 'laugh'],
   chapter: '總結', stage: 6, facet: '總結', hat: false,
   html: `
   <h2 class="scene-h"${A('left', 0)}>${ic('shield', '#0f766e', 34)}今日重點總整理</h2>
